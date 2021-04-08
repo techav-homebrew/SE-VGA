@@ -33,15 +33,64 @@ logic [9:0] vCount;
 wire hActive;
 wire hSEActive;
 
-logic [7:0] vidVramData;
+//logic [7:0] vidVramData;
 logic [12:0] vidVramAddr;
+//logic [7:0] cpuVramData;
+logic [12:0] cpuVramAddr;
 
 
 // link module that generates all our timing signals
-vgagen vgatiming(nReset,pixClk,hCount,hActive,hSEActive,nhSync,vCount,vActive,vSEActive,nvSync);
-// link module that fetches & outputs video data
-vgaout vidvram(pixClock,nReset,hCount,vCount,hSEActive,vSEActive,vidVramData,vidVramAddr,nvramOE,vidOut);
-// link module that handles cpu writes
+vgagen vgatiming(
+    .nReset(nReset),
+    .pixClk(pixClk),
+    .hCount(hCount),
+    .hActive(hActive),
+    .hSEActive(hSEActive),
+    .nhSync(nhSync),
+    .vCount(vCount),
+    .vActive(vActive),
+    .vSEActive(vSEActive),
+    .nvSync(nvSync)
+);
 
+// link module that fetches & outputs video data
+vgaout vidvram(
+    .pixClock(pixClk),
+    .nReset(nReset),
+    .hCount(hCount),
+    .vCount(vCount),
+    .hSEActive(hSEActive),
+    .vSEActive(vSEActive),
+    .vramData(vramData),
+    .vramAddr(vidVramAddr),
+    .nvramOE(nvramOE),
+    .vidOut(vidOut)
+);
+
+// link module that handles cpu writes
+cpusnoop cpusnp(    
+    .nReset(nReset),
+    .pixClock(pixClk),
+    .sequence(hCount[2:0]),
+    .cpuAddr(cpuAddr),
+    .cpuData(cpuData),
+    .ncpuAS(ncpuAS),
+    .ncpuUDS(ncpuUDS),
+    .ncpuLDS(ncpuLDS),
+    .cpuRnW(cpuRnW),
+    .cpuClk(cpuClk),
+    .vramAddr(vramAddr),
+    .vramData(cpuVramData),
+    .nvramWE(nvramWE)
+);
+
+always_comb begin
+    // vramAddr muxing
+    if(.nvramWE == 1'b0) begin
+        vramAddr <= cpuVramAddr;
+    end else begin
+        vramAddr <= vidVramData;
+    end
+end
 
 endmodule

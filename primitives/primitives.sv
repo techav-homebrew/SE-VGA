@@ -45,8 +45,29 @@ module mux8x1 (
     input logic[2:0] select,
     output wire out
 );
-    always_comb begin
-        out <= in[select];
+    assign out <= in[select];
+endmodule
+
+// basic 8-to-1 mux with transparent output latch
+module mux8x1latch (
+    input logic[7:0] in,
+    input logic[2:0] select,
+    input wire clock,
+    input wire nReset,
+    output reg out
+);
+    wire muxOut;
+    mux8x1 mux (in,select,muxOut);
+
+    // transparent latch -- when clock is low, output will
+    // follow the output of the mux. When clock is high,
+    // output will hold its last value.
+    always @(clock or nReset or muxOut) begin
+        if(nReset == 1'b0) begin
+            out <= 1'b0;
+        end else if(clock == 1'b0) begin
+            out <= muxOut;
+        end
     end
 endmodule
 

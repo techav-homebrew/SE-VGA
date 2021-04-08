@@ -25,8 +25,25 @@ module vgaout (
 reg [7:0] rVid;
 wire vidMuxOut;
 wire vidActive; // combined active video signal
+wire vidMuxClk; // latch mux output just before updating rVid
 
-mux8x1 vidOutMux(rVid[7:0],hCount[2:0],vidMuxOut);
+// select bits 0..7 from the vram data in rVid, and latch if
+// vidMuxClk goes high
+mux8x1latch vidOutMux(rVid,hCount[2:0],vidMuxClk,nReset,vidMuxOut);
+
+// vidMuxClk should be low during sequence 0..6, and high for 7
+// this may lead to a race condition trying to change the mux
+// before the output is latched. The alternative is to latch on
+// the rising edge of pixClock during sequence 7, but then we may
+// have a race condition with the data coming in from VRAM.
+// What we really need is a half clock delay :-/
+always_comb begin
+    if(hCount[2:0] == 3'd7) begin
+        vidMuxClk <= 1'b1;
+    end else begin
+        vidMuxClk <= 1'b0;
+    end
+end
 
 // latch incoming vram data on rising clock and sequence 7
 always @(posedge pixClock or negedge nReset) begin
