@@ -7,14 +7,17 @@
  * Basic modules to be used elsewhere
  *****************************************************************************/
 
+`ifndef PRIMS
+    `define PRIMS
+
 // basic d-flipflop
-module dff (
+module myDff (
     input wire nReset,
     input wire clk,
     input wire d,
     output reg q
 );
-    always @(posedge clock or negedge nReset) begin
+    always @(posedge clk or negedge nReset) begin
         if(nReset == 1'b0) begin
             q <= 1'b0;
         end else begin
@@ -45,7 +48,7 @@ module mux8x1 (
     input logic[2:0] select,
     output wire out
 );
-    assign out <= in[select];
+    assign out = in[select];
 endmodule
 
 // basic 8-to-1 mux with transparent output latch
@@ -62,11 +65,13 @@ module mux8x1latch (
     // transparent latch -- when clock is low, output will
     // follow the output of the mux. When clock is high,
     // output will hold its last value.
-    always @(clock or nReset or muxOut) begin
+    always @(clock or nReset or muxOut or out) begin
         if(nReset == 1'b0) begin
-            out <= 1'b0;
+            out = 1'b0;
         end else if(clock == 1'b0) begin
-            out <= muxOut;
+            out = muxOut;
+        end else begin
+            out = out;
         end
     end
 endmodule
@@ -84,14 +89,16 @@ module piso8 (
     logic [7:0] muxOuts;
 
     mux8 loader(muxIns[7:0],parIn[7:0],load,muxOuts[7:0]);
-    dff u0(nReset,clk,muxOuts[0],muxIns[1]);
-    dff u1(nReset,clk,muxOuts[1],muxIns[2]);
-    dff u2(nReset,clk,muxOuts[2],muxIns[3]);
-    dff u3(nReset,clk,muxOuts[3],muxIns[4]);
-    dff u4(nReset,clk,muxOuts[4],muxIns[5]);
-    dff u5(nReset,clk,muxOuts[5],muxIns[6]);
-    dff u6(nReset,clk,muxOuts[6],muxIns[7]);
-    dff u7(nReset,clk,muxOuts[7],muxIns[0]);
+    myDff u0(nReset,clk,muxOuts[0],muxIns[1]);
+    myDff u1(nReset,clk,muxOuts[1],muxIns[2]);
+    myDff u2(nReset,clk,muxOuts[2],muxIns[3]);
+    myDff u3(nReset,clk,muxOuts[3],muxIns[4]);
+    myDff u4(nReset,clk,muxOuts[4],muxIns[5]);
+    myDff u5(nReset,clk,muxOuts[5],muxIns[6]);
+    myDff u6(nReset,clk,muxOuts[6],muxIns[7]);
+    myDff u7(nReset,clk,muxOuts[7],muxIns[0]);
 
-    out <= muxIns[0];
+    assign out = muxIns[0];
 endmodule
+
+`endif

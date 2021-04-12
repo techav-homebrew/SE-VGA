@@ -7,6 +7,9 @@
  * Generates VGA timing signals & counters
  *****************************************************************************/
 
+`ifndef VGAGEN
+    `define VGAGEN
+
 `include "vgacount.sv"
 
 module vgagen (
@@ -26,3 +29,5 @@ vgacount #(800,592,688,576,736,512) hoz(nReset,pixClk,hCount,nhSync,hActive,hSEA
 vgacount #(525,421,423,411,456,342) ver(nReset,nhSync,vCount,nvSync,vActive,vSEActive);
 
 endmodule
+
+`endif

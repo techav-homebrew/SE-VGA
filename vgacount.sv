@@ -7,10 +7,13 @@
  * Low-level VGA signal counter
  *****************************************************************************/
 
+`ifndef VGACOUNT
+    `define VGACOUNT
+
 module vgacount (
     input wire              nReset,         // system reset signal
     input wire              clock,          // counter increment clock
-    output logic [9:0]     count,          // count output
+    output logic [9:0]      count,          // count output
     output wire             nSync,          // sync pulse
     output wire             activeVid,      // active video signal
     output wire             activeSE        // secondary active video signal (SE)
@@ -45,23 +48,25 @@ always_comb begin
     count <= counter;
 
     // Sync pulse
-    if(hCount >= SYNCBEGIN && hCount < SYNCEND) begin
-        nhSync <= 1'b0;
+    if(count >= SYNCBEGIN && count < SYNCEND) begin
+        nSync <= 1'b0;
     end else begin
-        nhSync <= 1'b1;
+        nSync <= 1'b1;
     end
 
-    if(hCount >= ACTBEGIN && hCount < ACTEND) begin
-        hActive <= 1'b0;
+    if(count >= ACTBEGIN && count < ACTEND) begin
+        activeVid <= 1'b0;
     end else begin
-        hActive <= 1'b1;
+        activeVid <= 1'b1;
     end
 
-    if(hCount >= SEACTBEGIN) begin
-        hSEActive <= 1'b0;
+    if(count >= SEACTBEGIN) begin
+        activeSE <= 1'b0;
     end else begin
-        hSEActive <= 1'b1;
+        activeSE <= 1'b1;
     end
 end
 
 endmodule
+
+`endif

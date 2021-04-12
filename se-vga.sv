@@ -7,14 +7,14 @@
  * Pulls together all the smaller modules to form the SE-VGA adapter
  *****************************************************************************/
 
-module design sevga (
+module sevga (
     input wire              nReset,     // System reset signal
     input wire              pixClk,     // 25.175MHz pixel clock
     output wire             nhSync,     // HSync signal
     output wire             nvSync,     // VSync signal
     output wire             vidOut,     // 1-bit Monochrome video signal
 
-    output logic [12:0]     vramAddr,   // VRAM Address bus
+    output logic [14:0]     vramAddr,   // VRAM Address bus
     inout logic [7:0]       vramData,   // VRAM Data bus
     output wire             nvramOE,    // VRAM Read strobe
     output wire             nvramWE,    // VRAM Write strobe
@@ -25,19 +25,21 @@ module design sevga (
     input wire              ncpuUDS,    // CPU Upper Data Strobe signal
     input wire              ncpuLDS,    // CPU Lower Data Strobe signal
     input wire              cpuRnW,     // CPU Read/Write select signal
-    input wire              cpuClk      // CPU Clock
+    //input wire              cpuClk,     // CPU Clock (probably not needed)
+    input logic [2:0]       ramSize     // Select installed RAM size
 );
 
 logic [9:0] hCount;
 logic [9:0] vCount;
 wire hActive;
 wire hSEActive;
+wire vActive;
+wire vSEActive;
 
-//logic [7:0] vidVramData;
-logic [12:0] vidVramAddr;
-//logic [7:0] cpuVramData;
-logic [12:0] cpuVramAddr;
-
+logic [14:0] vidVramAddr;
+logic [14:0] cpuVramAddr;
+logic [7:0] vidVramData;
+wire [7:0] cpuVramData;
 
 // link module that generates all our timing signals
 vgagen vgatiming(
@@ -61,7 +63,7 @@ vgaout vidvram(
     .vCount(vCount),
     .hSEActive(hSEActive),
     .vSEActive(vSEActive),
-    .vramData(vramData),
+    .vramData(vidVramData),
     .vramAddr(vidVramAddr),
     .nvramOE(nvramOE),
     .vidOut(vidOut)
@@ -71,7 +73,7 @@ vgaout vidvram(
 cpusnoop cpusnp(    
     .nReset(nReset),
     .pixClock(pixClk),
-    .sequence(hCount[2:0]),
+    .seq(hCount[2:0]),
     .cpuAddr(cpuAddr),
     .cpuData(cpuData),
     .ncpuAS(ncpuAS),
@@ -79,18 +81,28 @@ cpusnoop cpusnp(
     .ncpuLDS(ncpuLDS),
     .cpuRnW(cpuRnW),
     .cpuClk(cpuClk),
-    .vramAddr(vramAddr),
-    .vramData(cpuVramData),
-    .nvramWE(nvramWE)
+    .vramAddr(cpuVramAddr),
+    .vramDataOut(cpuVramData),
+    .nvramWE(nvramWE),
+    .ramSize(ramSize)
 );
 
 always_comb begin
     // vramAddr muxing
-    if(.nvramWE == 1'b0) begin
+    if(nvramWE == 1'b0) begin
         vramAddr <= cpuVramAddr;
     end else begin
-        vramAddr <= vidVramData;
+        vramAddr <= vidVramAddr;
     end
+end
+
+always_comb begin
+    if(nvramWE == 1'b0) begin
+        vramData <= cpuVramData;
+    end else begin
+        vramData <= 8'bZZZZZZZZ;
+    end
+    vidVramData <= vramData;
 end
 
 endmodule

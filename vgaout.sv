@@ -7,7 +7,7 @@
  * Fetches video data from VRAM and shifts out
  *****************************************************************************/
 
-`include "primitives.sv"
+`include "primitives/primitives.sv"
 
 module vgaout (
     input wire          pixClock,
@@ -16,8 +16,8 @@ module vgaout (
     input logic [9:0]   vCount,
     input wire          hSEActive,
     input wire          vSEActive,
-    inout logic [7:0]   vramData,
-    output logic [12:0] vramAddr,
+    input logic [7:0]   vramData,
+    output logic [14:0] vramAddr,
     output wire         nvramOE,
     output wire         vidOut
 );
@@ -50,7 +50,7 @@ always @(posedge pixClock or negedge nReset) begin
     if(nReset == 1'b0) begin
         rVid <= 8'h0;
     end else begin
-        if(hCount[2:0] == 3'b7) begin
+        if(hCount[2:0] == 3'h7) begin
             rVid <= vramData;
         end
     end
@@ -72,7 +72,7 @@ always_comb begin
     end
 
     // vram read signal
-    if(vidActive == 1'b1 && hCount[2:0] == 3'b7) begin
+    if(vidActive == 1'b1 && hCount[2:0] == 3'h7) begin
         nvramOE <= 1'b0;
     end else begin
         nvramOE <= 1'b1;
@@ -80,7 +80,7 @@ always_comb begin
 
     // vram address signals
     // these will be mux'd with cpu addresses externally
-    vramAddr[12:6] <= vCount[6:0];
+    vramAddr[14:6] <= vCount[8:0];
     vramAddr[5:0]  <= hCount[8:3];
 end
     
