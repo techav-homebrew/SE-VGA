@@ -25,6 +25,25 @@ module vgaout (
 reg [7:0] rVid;
 wire vidMuxOut;
 wire vidActive; // combined active video signal
+
+vidShiftOut vOut(
+    .nReset(nReset),
+    .clk(pixClock),
+    .vidActive(vidActive),
+    .seq(hCount[2:0]),
+    .parIn(vramData),
+    .out(vidMuxOut)
+);
+
+/*module vidShiftOut (
+    input wire nReset,
+    input wire clk,
+    input logic [2:0] seq,
+    input logic [7:0] parIn,
+    output wire out,
+);*/
+
+/*
 wire vidMuxClk; // latch mux output just before updating rVid
 
 // select bits 0..7 from the vram data in rVid, and latch if
@@ -44,6 +63,7 @@ always_comb begin
         vidMuxClk <= 1'b0;
     end
 end
+*/
 
 // latch incoming vram data on rising clock and sequence 7
 always @(posedge pixClock or negedge nReset) begin
@@ -59,6 +79,14 @@ end
 always_comb begin
     // combined video active signal
     if(hSEActive == 1'b1 && vSEActive == 1'b1) begin
+        vidActive <= 1'b1;
+    end else if(hCount == 799 && vCount == 524) begin
+        // this is the exception to ensure the first byte of video is loaded
+        // just before the new frame starts
+        vidActive <= 1'b1;
+    end else if(vSEActive == 1'b1 && hCount == 10'd799) begin
+        // this is the exception to ensure the first byte of video is loaded
+        // just before a new line starts
         vidActive <= 1'b1;
     end else begin
         vidActive <= 1'b0;

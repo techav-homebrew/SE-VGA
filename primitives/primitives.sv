@@ -10,6 +10,7 @@
 `ifndef PRIMS
     `define PRIMS
 
+/*
 // basic d-flipflop
 module myDff (
     input wire nReset,
@@ -25,7 +26,9 @@ module myDff (
         end
     end
 endmodule
+*/
 
+/*
 // basic 8-bit mux
 module mux8 (
     input logic [7:0] inA,
@@ -41,7 +44,9 @@ module mux8 (
         end
     end
 endmodule
+*/
 
+/*
 // basic 8-to-1 mux
 module mux8x1 (
     input logic[7:0] in,
@@ -50,7 +55,9 @@ module mux8x1 (
 );
     assign out = in[select];
 endmodule
+*/
 
+/*
 // basic 8-to-1 mux with transparent output latch
 module mux8x1latch (
     input logic[7:0] in,
@@ -75,7 +82,9 @@ module mux8x1latch (
         end
     end
 endmodule
+*/
 
+/*
 // basic 8-bit PISO shift register
 module piso8 (
     input wire nReset,
@@ -99,6 +108,50 @@ module piso8 (
     myDff u7(nReset,clk,muxOuts[7],muxIns[0]);
 
     assign out = muxIns[0];
+endmodule
+*/
+
+module vidShiftOut (
+    input wire nReset,
+    input wire clk,
+    input wire vidActive,
+    input logic [2:0] seq,
+    input logic [7:0] parIn,
+    output wire out,
+);
+    /* Shift register functioning similar to a 74597, with 8-bit input latch
+     * and 8-bit PISO shift register output stage.
+     * In sequence 7 new data is loaded from VRAM into the input stage, and in
+     * sequence 0 the input stage is copied to the output stage to be shifted.
+     */
+    reg [7:0] inReg;
+    reg [7:0] outReg;
+
+    always @(negedge clk or negedge nReset) begin
+        if(nReset == 1'b0) begin
+            inReg <= 0;
+            outReg <= 0;
+        end else begin
+            if(vidActive == 1'b1) begin
+                if(seq == 0) begin
+                    outReg <= inReg;
+                end else begin
+                    outReg[7] <= outReg[6];
+                    outReg[6] <= outReg[5];
+                    outReg[5] <= outReg[4];
+                    outReg[4] <= outReg[3];
+                    outReg[3] <= outReg[2];
+                    outReg[2] <= outReg[1];
+                    outReg[1] <= outReg[0];
+                    outReg[0] <= 1'b0;
+                end
+                if(seq == 7) begin
+                    inReg <= parIn;
+                end
+            end
+        end
+    end
+    assign out = outReg[7];
 endmodule
 
 `endif
