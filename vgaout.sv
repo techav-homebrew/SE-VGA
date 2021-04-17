@@ -22,7 +22,7 @@ module vgaout (
     output wire         vidOut
 );
 
-reg [7:0] rVid;
+//reg [7:0] rVid;
 wire vidMuxOut;
 wire vidActive; // combined active video signal
 
@@ -66,7 +66,7 @@ end
 */
 
 // latch incoming vram data on rising clock and sequence 7
-always @(posedge pixClock or negedge nReset) begin
+/*always @(posedge pixClock or negedge nReset) begin
     if(nReset == 1'b0) begin
         rVid <= 8'h0;
     end else begin
@@ -74,7 +74,7 @@ always @(posedge pixClock or negedge nReset) begin
             rVid <= vramData;
         end
     end
-end
+end*/
 
 always_comb begin
     // combined video active signal

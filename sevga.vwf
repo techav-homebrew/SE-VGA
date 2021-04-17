@@ -847,6 +847,356 @@ GROUP("cpuAddr")
 	MEMBERS = "cpuAddr[1]", "cpuAddr[2]", "cpuAddr[3]", "cpuAddr[4]", "cpuAddr[5]", "cpuAddr[6]", "cpuAddr[7]", "cpuAddr[8]", "cpuAddr[9]", "cpuAddr[10]", "cpuAddr[11]", "cpuAddr[12]", "cpuAddr[13]", "cpuAddr[14]", "cpuAddr[15]", "cpuAddr[16]", "cpuAddr[17]", "cpuAddr[18]", "cpuAddr[19]", "cpuAddr[20]", "cpuAddr[21]", "cpuAddr[22]", "cpuAddr[23]";
 }
 
+SIGNAL("cpusnoop:cpusnp|addrCache")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = BUS;
+	WIDTH = 14;
+	LSB_INDEX = 0;
+	DIRECTION = REGISTERED;
+	PARENT = "";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[13]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[12]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[11]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[10]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[9]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[8]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[7]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[6]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[5]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[4]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[3]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[2]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[1]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|addrCache[0]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|addrCache";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = BUS;
+	WIDTH = 8;
+	LSB_INDEX = 0;
+	DIRECTION = REGISTERED;
+	PARENT = "";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi[7]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheHi";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi[6]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheHi";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi[5]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheHi";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi[4]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheHi";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi[3]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheHi";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi[2]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheHi";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi[1]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheHi";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheHi[0]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheHi";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = BUS;
+	WIDTH = 8;
+	LSB_INDEX = 0;
+	DIRECTION = REGISTERED;
+	PARENT = "";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo[7]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheLo";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo[6]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheLo";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo[5]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheLo";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo[4]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheLo";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo[3]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheLo";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo[2]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheLo";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo[1]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheLo";
+}
+
+SIGNAL("cpusnoop:cpusnp|dataCacheLo[0]")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "cpusnoop:cpusnp|dataCacheLo";
+}
+
+SIGNAL("cpusnoop:cpusnp|pendWriteHi")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "";
+}
+
+SIGNAL("cpusnoop:cpusnp|pendWriteLo")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = REGISTERED;
+	PARENT = "";
+}
+
 TRANSITION_LIST("cpuAddr[1]")
 {
 	NODE
@@ -861,7 +1211,9 @@ TRANSITION_LIST("cpuAddr[2]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 960.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -888,7 +1240,11 @@ TRANSITION_LIST("cpuAddr[5]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -915,7 +1271,11 @@ TRANSITION_LIST("cpuAddr[8]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -924,7 +1284,11 @@ TRANSITION_LIST("cpuAddr[9]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -933,7 +1297,11 @@ TRANSITION_LIST("cpuAddr[10]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -960,7 +1328,11 @@ TRANSITION_LIST("cpuAddr[13]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -978,7 +1350,11 @@ TRANSITION_LIST("cpuAddr[15]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -987,7 +1363,11 @@ TRANSITION_LIST("cpuAddr[16]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -996,7 +1376,11 @@ TRANSITION_LIST("cpuAddr[17]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1005,7 +1389,11 @@ TRANSITION_LIST("cpuAddr[18]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1014,7 +1402,11 @@ TRANSITION_LIST("cpuAddr[19]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1023,7 +1415,11 @@ TRANSITION_LIST("cpuAddr[20]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1032,7 +1428,11 @@ TRANSITION_LIST("cpuAddr[21]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1059,7 +1459,12 @@ TRANSITION_LIST("cpuClk")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		NODE
+		{
+			REPEAT = 264;
+			LEVEL 0 FOR 62.5;
+			LEVEL 1 FOR 62.5;
+		}
 	}
 }
 
@@ -1068,7 +1473,11 @@ TRANSITION_LIST("cpuData[15]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1077,7 +1486,9 @@ TRANSITION_LIST("cpuData[14]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 960.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1086,7 +1497,9 @@ TRANSITION_LIST("cpuData[13]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 32080.0;
 	}
 }
 
@@ -1113,7 +1526,9 @@ TRANSITION_LIST("cpuData[10]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 32080.0;
 	}
 }
 
@@ -1122,7 +1537,9 @@ TRANSITION_LIST("cpuData[9]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 960.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1131,7 +1548,11 @@ TRANSITION_LIST("cpuData[8]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1140,7 +1561,11 @@ TRANSITION_LIST("cpuData[7]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1149,7 +1574,9 @@ TRANSITION_LIST("cpuData[6]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 32080.0;
 	}
 }
 
@@ -1158,7 +1585,9 @@ TRANSITION_LIST("cpuData[5]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 32080.0;
 	}
 }
 
@@ -1167,7 +1596,9 @@ TRANSITION_LIST("cpuData[4]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 960.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1185,7 +1616,11 @@ TRANSITION_LIST("cpuData[2]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1194,7 +1629,11 @@ TRANSITION_LIST("cpuData[1]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 40.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 31720.0;
 	}
 }
 
@@ -1203,7 +1642,9 @@ TRANSITION_LIST("cpuData[0]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 0 FOR 600.0;
+		LEVEL 1 FOR 320.0;
+		LEVEL 0 FOR 32080.0;
 	}
 }
 
@@ -1212,7 +1653,11 @@ TRANSITION_LIST("cpuRnW")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 1 FOR 600.0;
+		LEVEL 0 FOR 320.0;
+		LEVEL 1 FOR 40.0;
+		LEVEL 0 FOR 320.0;
+		LEVEL 1 FOR 31720.0;
 	}
 }
 
@@ -1232,7 +1677,11 @@ TRANSITION_LIST("ncpuAS")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 1 FOR 610.0;
+		LEVEL 0 FOR 310.0;
+		LEVEL 1 FOR 60.0;
+		LEVEL 0 FOR 300.0;
+		LEVEL 1 FOR 31720.0;
 	}
 }
 
@@ -1241,7 +1690,11 @@ TRANSITION_LIST("ncpuLDS")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 1 FOR 760.0;
+		LEVEL 0 FOR 160.0;
+		LEVEL 1 FOR 200.0;
+		LEVEL 0 FOR 160.0;
+		LEVEL 1 FOR 31720.0;
 	}
 }
 
@@ -1250,7 +1703,9 @@ TRANSITION_LIST("ncpuUDS")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 1 FOR 760.0;
+		LEVEL 0 FOR 160.0;
+		LEVEL 1 FOR 32080.0;
 	}
 }
 
@@ -1309,7 +1764,7 @@ TRANSITION_LIST("ramSize[2]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 1 FOR 33000.0;
 	}
 }
 
@@ -1318,7 +1773,7 @@ TRANSITION_LIST("ramSize[1]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 1 FOR 33000.0;
 	}
 }
 
@@ -1327,7 +1782,7 @@ TRANSITION_LIST("ramSize[0]")
 	NODE
 	{
 		REPEAT = 1;
-		LEVEL 0 FOR 33000.0;
+		LEVEL 1 FOR 33000.0;
 	}
 }
 
@@ -1595,6 +2050,294 @@ TRANSITION_LIST("vramData[0]")
 	}
 }
 
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[13]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[12]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[11]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[10]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[9]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[8]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[7]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[6]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[5]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[4]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[3]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[2]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[1]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|addrCache[0]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheHi[7]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheHi[6]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheHi[5]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheHi[4]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheHi[3]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheHi[2]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheHi[1]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheHi[0]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheLo[7]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheLo[6]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheLo[5]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheLo[4]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheLo[3]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheLo[2]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheLo[1]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|dataCacheLo[0]")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|pendWriteHi")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("cpusnoop:cpusnp|pendWriteLo")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL U FOR 33000.0;
+	}
+}
+
 DISPLAY_LINE
 {
 	CHANNEL = "cpuAddr";
@@ -1607,7 +2350,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[1]";
+	CHANNEL = "cpuAddr[23]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 1;
@@ -1617,7 +2360,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[2]";
+	CHANNEL = "cpuAddr[22]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 2;
@@ -1627,7 +2370,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[3]";
+	CHANNEL = "cpuAddr[21]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 3;
@@ -1637,7 +2380,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[4]";
+	CHANNEL = "cpuAddr[20]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 4;
@@ -1647,7 +2390,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[5]";
+	CHANNEL = "cpuAddr[19]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 5;
@@ -1657,7 +2400,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[6]";
+	CHANNEL = "cpuAddr[18]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 6;
@@ -1667,7 +2410,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[7]";
+	CHANNEL = "cpuAddr[17]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 7;
@@ -1677,7 +2420,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[8]";
+	CHANNEL = "cpuAddr[16]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 8;
@@ -1687,7 +2430,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[9]";
+	CHANNEL = "cpuAddr[15]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 9;
@@ -1697,7 +2440,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[10]";
+	CHANNEL = "cpuAddr[14]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 10;
@@ -1707,7 +2450,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[11]";
+	CHANNEL = "cpuAddr[13]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 11;
@@ -1727,7 +2470,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[13]";
+	CHANNEL = "cpuAddr[11]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 13;
@@ -1737,7 +2480,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[14]";
+	CHANNEL = "cpuAddr[10]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 14;
@@ -1747,7 +2490,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[15]";
+	CHANNEL = "cpuAddr[9]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 15;
@@ -1757,7 +2500,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[16]";
+	CHANNEL = "cpuAddr[8]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 16;
@@ -1767,7 +2510,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[17]";
+	CHANNEL = "cpuAddr[7]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 17;
@@ -1777,7 +2520,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[18]";
+	CHANNEL = "cpuAddr[6]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 18;
@@ -1787,7 +2530,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[19]";
+	CHANNEL = "cpuAddr[5]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 19;
@@ -1797,7 +2540,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[20]";
+	CHANNEL = "cpuAddr[4]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 20;
@@ -1807,7 +2550,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[21]";
+	CHANNEL = "cpuAddr[3]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 21;
@@ -1817,7 +2560,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[22]";
+	CHANNEL = "cpuAddr[2]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 22;
@@ -1827,7 +2570,7 @@ DISPLAY_LINE
 
 DISPLAY_LINE
 {
-	CHANNEL = "cpuAddr[23]";
+	CHANNEL = "cpuAddr[1]";
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Hexadecimal;
 	TREE_INDEX = 23;
@@ -2401,6 +3144,354 @@ DISPLAY_LINE
 	TREE_INDEX = 81;
 	TREE_LEVEL = 1;
 	PARENT = 73;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 82;
+	TREE_LEVEL = 0;
+	CHILDREN = 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[13]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 83;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[12]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 84;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[11]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 85;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[10]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 86;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[9]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 87;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[8]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 88;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[7]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 89;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[6]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 90;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[5]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 91;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[4]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 92;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[3]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 93;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[2]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 94;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[1]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 95;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|addrCache[0]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 96;
+	TREE_LEVEL = 1;
+	PARENT = 82;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 97;
+	TREE_LEVEL = 0;
+	CHILDREN = 98, 99, 100, 101, 102, 103, 104, 105;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi[7]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 98;
+	TREE_LEVEL = 1;
+	PARENT = 97;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi[6]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 99;
+	TREE_LEVEL = 1;
+	PARENT = 97;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi[5]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 100;
+	TREE_LEVEL = 1;
+	PARENT = 97;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi[4]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 101;
+	TREE_LEVEL = 1;
+	PARENT = 97;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi[3]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 102;
+	TREE_LEVEL = 1;
+	PARENT = 97;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi[2]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 103;
+	TREE_LEVEL = 1;
+	PARENT = 97;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi[1]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 104;
+	TREE_LEVEL = 1;
+	PARENT = 97;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheHi[0]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 105;
+	TREE_LEVEL = 1;
+	PARENT = 97;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 106;
+	TREE_LEVEL = 0;
+	CHILDREN = 107, 108, 109, 110, 111, 112, 113, 114;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo[7]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 107;
+	TREE_LEVEL = 1;
+	PARENT = 106;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo[6]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 108;
+	TREE_LEVEL = 1;
+	PARENT = 106;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo[5]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 109;
+	TREE_LEVEL = 1;
+	PARENT = 106;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo[4]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 110;
+	TREE_LEVEL = 1;
+	PARENT = 106;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo[3]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 111;
+	TREE_LEVEL = 1;
+	PARENT = 106;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo[2]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 112;
+	TREE_LEVEL = 1;
+	PARENT = 106;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo[1]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 113;
+	TREE_LEVEL = 1;
+	PARENT = 106;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|dataCacheLo[0]";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Hexadecimal;
+	TREE_INDEX = 114;
+	TREE_LEVEL = 1;
+	PARENT = 106;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|pendWriteHi";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Binary;
+	TREE_INDEX = 115;
+	TREE_LEVEL = 0;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "cpusnoop:cpusnp|pendWriteLo";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Binary;
+	TREE_INDEX = 116;
+	TREE_LEVEL = 0;
 }
 
 TIME_BAR

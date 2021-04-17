@@ -117,7 +117,7 @@ module vidShiftOut (
     input wire vidActive,
     input logic [2:0] seq,
     input logic [7:0] parIn,
-    output wire out,
+    output wire out
 );
     /* Shift register functioning similar to a 74597, with 8-bit input latch
      * and 8-bit PISO shift register output stage.

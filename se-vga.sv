@@ -35,6 +35,7 @@ wire hActive;
 wire hSEActive;
 wire vActive;
 wire vSEActive;
+wire nvramWEpre;
 
 logic [14:0] vidVramAddr;
 logic [14:0] cpuVramAddr;
@@ -83,13 +84,13 @@ cpusnoop cpusnp(
     .cpuClk(cpuClk),
     .vramAddr(cpuVramAddr),
     .vramDataOut(cpuVramData),
-    .nvramWE(nvramWE),
+    .nvramWE(nvramWEpre),
     .ramSize(ramSize)
 );
 
 always_comb begin
     // vramAddr muxing
-    if(nvramWE == 1'b0) begin
+    if(nvramWEpre == 1'b0) begin
         vramAddr <= cpuVramAddr;
     end else begin
         vramAddr <= vidVramAddr;
@@ -97,12 +98,14 @@ always_comb begin
 end
 
 always_comb begin
-    if(nvramWE == 1'b0) begin
+    if(nvramWEpre == 1'b0) begin
         vramData <= cpuVramData;
     end else begin
         vramData <= 8'bZZZZZZZZ;
     end
     vidVramData <= vramData;
 end
+
+assign nvramWE = nvramWEpre | pixClk;
 
 endmodule
