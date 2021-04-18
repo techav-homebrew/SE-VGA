@@ -32,6 +32,7 @@ module cpusnoop (
     logic [7:0] dataCacheHi;    // store data for cpu writes to high byte
     wire cpuBufSel;             // is CPU accessing frame buffer?
     logic [2:0] cycleState;     // state machine state
+    reg cpuCycleEnded;          // mark cpu has ended its cycle
 
     // define state machine states
     parameter
@@ -65,6 +66,14 @@ module cpusnoop (
         end else begin
             cpuBufSel <= 1'b0;
         end
+    end
+
+    // keep an eye out for cpu ending its cycle
+    always @(negedge pixClock or negedge nReset) begin
+        if(!nReset) cpuCycleEnded <= 0;
+        else if(cycleState == S2) cpuCycleEnded <= 0;
+        else if(ncpuUDS == 1 && ncpuLDS == 1 && (cycleState == S3 || cycleState == S4 || cycleState == S5)) cpuCycleEnded <= 1;
+        else cpuCycleEnded <= cpuCycleEnded;
     end
     
     // CPU Write to VRAM state machine
@@ -156,7 +165,8 @@ module cpusnoop (
                 end
                 S5 : begin
                     // wait for CPU to negate both ncpuUDS and ncpuLDS
-                    if(ncpuUDS == 1 && ncpuLDS == 1) begin
+                    //if(ncpuUDS == 1 && ncpuLDS == 1) begin
+                    if(cpuCycleEnded == 1) begin
                         cycleState <= S0;
                     end else begin
                         cycleState <= S5;
