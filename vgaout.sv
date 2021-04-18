@@ -26,27 +26,33 @@ module vgaout (
 wire vidMuxOut;
 wire vidActive; // combined active video signal
 
+//wire vgaShiftEn; // Enable pixel shift out
+wire vgaShiftL1; // Load VRAM data into register
+wire vgaShiftL2; // Load VRAM data into shifter
+
 vgaShiftOut vOut(
     .nReset(nReset),
     .clk(pixClock),
-    .vidActive(vidActive),
-    .seq(hCount[2:0]),
+    .shiftEn(vidActive),
+    .nLoad1(vgaShiftL1),
+    .nLoad2(vgaShiftL2),
     .parIn(vramData),
     .out(vidMuxOut)
 );
 
 always_comb begin
+    // load VRAM data into register
+    if(hCount[2:0] == 0) vgaShiftL1 <= !pixClock;
+    else vgaShiftL1 <= 1;
+
+    // load VRAM data into shifter
+    if(hCount[2:0] == 0) vgaShiftL2 <= !pixClock;
+    else if(hCount[2:0] == 1) vgaShiftL2 <= pixClock;
+    else vgaShiftL2 <= 1;
+
     // combined video active signal
     if(hSEActive == 1'b1 && vSEActive == 1'b1) begin
         vidActive <= 1'b1;
-    /*end else if(hCount == 799 && vCount == 524) begin
-        // this is the exception to ensure the first byte of video is loaded
-        // just before the new frame starts
-        vidActive <= 1'b1;
-    end else if(vSEActive == 1'b1 && hCount == 10'd799) begin
-        // this is the exception to ensure the first byte of video is loaded
-        // just before a new line starts
-        vidActive <= 1'b1;*/
     end else begin
         vidActive <= 1'b0;
     end
@@ -59,7 +65,7 @@ always_comb begin
     end
 
     // vram read signal
-    if(vidActive == 1'b1 && hCount[2:0] == 3'h7) begin
+    if(vidActive == 1'b1 && hCount[2:0] == 0) begin
         nvramOE <= 1'b0;
     end else begin
         nvramOE <= 1'b1;

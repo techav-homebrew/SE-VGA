@@ -118,7 +118,7 @@ module cpusnoop (
                 S2 : begin
                     // wait for sequence
                     if(pendWriteHi == 1 && pendWriteLo == 1) begin
-                        if(seq < 5) begin
+                        if(seq < 6) begin
                             // we have enough time to write both before the next VRAM read
                             cycleState <= S3;
                         end else begin
@@ -126,7 +126,7 @@ module cpusnoop (
                             cycleState <= S2;
                         end
                     end else if(pendWriteHi == 1 || pendWriteLo == 1) begin
-                        if(seq < 6) begin
+                        if(seq < 7) begin
                             // we have enough time for the pending write
                             if(pendWriteLo == 0) begin
                                 // move on to write high byte
