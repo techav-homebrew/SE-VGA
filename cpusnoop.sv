@@ -45,7 +45,7 @@ module cpusnoop (
     
     // when cpu addresses the framebuffer, set our enable signal
     /* framebuffer starts $5900 below the top of RAM
-     * ramSize is used to mask the cpuAddr bits [21:9] to select the amount
+     * ramSize is used to mask the cpuAddr bits [21:19] to select the amount
      * of memory installed in the computer. Not all possible ramSize selections
      * are valid memory sizes when using 30-pin SIMMs in the Mac SE. 
      * They may be possible using PDS RAM expansion cards.
@@ -175,6 +175,12 @@ module cpusnoop (
     end
 
     always_comb begin
+        // output VRAM address
+        // we actually do an endian swap here assigning the low-order bit of
+        // the VRAM address because the video shift register in the SE loads
+        // a full 16-bit word and shifts out starting with the MSB.
+        // An endian swap here ensures that when we load the VRAM for output
+        // the bits are in the right order. 
         vramAddr[14:1] <= addrCache[13:0];
         if(cycleState == S4) begin
             vramAddr[0] <= 0;
@@ -182,12 +188,16 @@ module cpusnoop (
             vramAddr[0] <= 1;
         end
 
+        // Assert VRAM Write signal during CPU Cycle states S3 & S4
         if(cycleState == S3 || cycleState == S4) begin
             nvramWE <= 0;
         end else begin
             nvramWE <= 1;
         end
 
+        // Output our internal data cache registers on CPU Cycle states S3 & S4
+        // Otherwise, just output 0. This will be muxed for the VRAM data bus
+        // in the next module outside of here.
         if(cycleState == S3) begin
             vramDataOut <= dataCacheLo;
         end else if(cycleState == S4) begin

@@ -19,12 +19,12 @@ module vgacount (
     output wire             activeSE        // secondary active video signal (SE)
 );
 
-parameter   COUNTMAX=800,
-            SYNCBEGIN=592,
-            SYNCEND=688,
-            ACTBEGIN=576,
-            ACTEND=736,
-            SEACTBEGIN=512;
+parameter   COUNTMAX=800,       // Total dot count per line or line count per frame
+            SYNCBEGIN=592,      // Dot/Line count where sync pulse begins
+            SYNCEND=688,        // Dot/Line count +1 where sync pulse ends
+            ACTBEGIN=576,       // Dot/Line count where VGA active video begins
+            ACTEND=736,         // Dot/Line count +1 where VGA active video ends
+            SEACTBEGIN=512;     // Dot/Line count +1 where SE video window ends
 
 logic [9:0] counter;
 

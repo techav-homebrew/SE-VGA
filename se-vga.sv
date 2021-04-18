@@ -25,7 +25,6 @@ module sevga (
     input wire              ncpuUDS,    // CPU Upper Data Strobe signal
     input wire              ncpuLDS,    // CPU Lower Data Strobe signal
     input wire              cpuRnW,     // CPU Read/Write select signal
-    //input wire              cpuClk,     // CPU Clock (probably not needed)
     input logic [2:0]       ramSize     // Select installed RAM size
 );
 
@@ -35,7 +34,7 @@ wire hActive;
 wire hSEActive;
 wire vActive;
 wire vSEActive;
-wire nvramWEpre;
+wire nvramWEpre;            // VRAM Write signal from cpu snoop
 
 logic [14:0] vidVramAddr;
 logic [14:0] cpuVramAddr;

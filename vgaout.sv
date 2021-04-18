@@ -22,14 +22,13 @@ module vgaout (
     output wire         vidOut
 );
 
-//reg [7:0] rVid;
-wire vidMuxOut;
+wire vidMuxOut; // pixel data shift out
 wire vidActive; // combined active video signal
 
-//wire vgaShiftEn; // Enable pixel shift out
 wire vgaShiftL1; // Load VRAM data into register
 wire vgaShiftL2; // Load VRAM data into shifter
 
+// connect module for video out shift register
 vgaShiftOut vOut(
     .nReset(nReset),
     .clk(pixClock),
