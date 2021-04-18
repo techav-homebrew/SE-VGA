@@ -39,14 +39,14 @@ always_comb begin
     // combined video active signal
     if(hSEActive == 1'b1 && vSEActive == 1'b1) begin
         vidActive <= 1'b1;
-    end else if(hCount == 799 && vCount == 524) begin
+    /*end else if(hCount == 799 && vCount == 524) begin
         // this is the exception to ensure the first byte of video is loaded
         // just before the new frame starts
         vidActive <= 1'b1;
     end else if(vSEActive == 1'b1 && hCount == 10'd799) begin
         // this is the exception to ensure the first byte of video is loaded
         // just before a new line starts
-        vidActive <= 1'b1;
+        vidActive <= 1'b1;*/
     end else begin
         vidActive <= 1'b0;
     end

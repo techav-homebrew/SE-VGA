@@ -54,12 +54,14 @@ always_comb begin
         nSync <= 1'b1;
     end
 
+    // VGA active video range
     if(count >= ACTBEGIN && count < ACTEND) begin
         activeVid <= 1'b0;
     end else begin
         activeVid <= 1'b1;
     end
 
+    // SE active video window within VGA active video range
     if(count >= SEACTBEGIN) begin
         activeSE <= 1'b0;
     end else begin
