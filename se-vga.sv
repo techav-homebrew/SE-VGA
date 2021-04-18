@@ -70,7 +70,7 @@ vgaout vidvram(
     .vidOut(vidOut)
 );
 
-// link module that handles cpu writes
+// link module that snoops cpu writes
 cpusnoop cpusnp(    
     .nReset(nReset),
     .pixClock(pixClk),
@@ -92,8 +92,10 @@ always_comb begin
     // vramAddr muxing
     if(nvramWEpre == 1'b0) begin
         vramAddr <= cpuVramAddr;
-    end else begin
+    end else if(nvramOE == 0) begin
         vramAddr <= vidVramAddr;
+    end else begin
+        vramAddr <= 0;
     end
 end
 

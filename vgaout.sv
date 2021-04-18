@@ -7,7 +7,7 @@
  * Fetches video data from VRAM and shifts out
  *****************************************************************************/
 
-`include "primitives/primitives.sv"
+`include "vgashiftout.sv"
 
 module vgaout (
     input wire          pixClock,
@@ -26,7 +26,7 @@ module vgaout (
 wire vidMuxOut;
 wire vidActive; // combined active video signal
 
-vidShiftOut vOut(
+vgaShiftOut vOut(
     .nReset(nReset),
     .clk(pixClock),
     .vidActive(vidActive),
@@ -34,47 +34,6 @@ vidShiftOut vOut(
     .parIn(vramData),
     .out(vidMuxOut)
 );
-
-/*module vidShiftOut (
-    input wire nReset,
-    input wire clk,
-    input logic [2:0] seq,
-    input logic [7:0] parIn,
-    output wire out,
-);*/
-
-/*
-wire vidMuxClk; // latch mux output just before updating rVid
-
-// select bits 0..7 from the vram data in rVid, and latch if
-// vidMuxClk goes high
-mux8x1latch vidOutMux(rVid,hCount[2:0],vidMuxClk,nReset,vidMuxOut);
-
-// vidMuxClk should be low during sequence 0..6, and high for 7
-// this may lead to a race condition trying to change the mux
-// before the output is latched. The alternative is to latch on
-// the rising edge of pixClock during sequence 7, but then we may
-// have a race condition with the data coming in from VRAM.
-// What we really need is a half clock delay :-/
-always_comb begin
-    if(hCount[2:0] == 3'd7) begin
-        vidMuxClk <= 1'b1;
-    end else begin
-        vidMuxClk <= 1'b0;
-    end
-end
-*/
-
-// latch incoming vram data on rising clock and sequence 7
-/*always @(posedge pixClock or negedge nReset) begin
-    if(nReset == 1'b0) begin
-        rVid <= 8'h0;
-    end else begin
-        if(hCount[2:0] == 3'h7) begin
-            rVid <= vramData;
-        end
-    end
-end*/
 
 always_comb begin
     // combined video active signal

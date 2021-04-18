@@ -36,12 +36,12 @@ module cpusnoop (
 
     // define state machine states
     parameter
-        S0  =   3'h0,
-        S1  =   3'h1,
-        S2  =   3'h2,
-        S3  =   3'h3,
-        S4  =   3'h4,
-        S5  =   3'h5;
+        S0  =   0,
+        //S1  =   3'h1,
+        S2  =   2,
+        S3  =   3,
+        S4  =   4,
+        S5  =   5;
     
     // when cpu addresses the framebuffer, set our enable signal
     /* framebuffer starts $5900 below the top of RAM
@@ -89,28 +89,11 @@ module cpusnoop (
             case (cycleState)
                 S0 : begin
                     // idle state, wait for valid address and ncpuAS asserted
-                    if(ncpuAS == 0 && cpuBufSel == 1 && cpuRnW == 0) begin
-                        cycleState <= S1;
-                    end else begin
-                        cycleState <= S0;
-                    end
-                end
-                S1 : begin
-                    // wait for either ncpuUDS or ncpuLDS to assert
-                    // if ncpuAS negates first, then abort back to S0
-                    if(ncpuAS == 1) begin
-                        // cpu aborted cycle
-                        cycleState <= S0;
-                    end else if(ncpuUDS == 0 || ncpuLDS == 0) begin
-                        if (ncpuUDS == 0) begin
-                            pendWriteHi <= 1;
-                            dataCacheHi <= cpuData[15:8];
-                        end
-                        if (ncpuLDS == 0) begin
-                            pendWriteLo <= 1;
-                            dataCacheLo <= cpuData[7:0];
-                        end
-
+                    if(ncpuAS == 0 && cpuBufSel == 1 && cpuRnW == 0 && (ncpuLDS == 0 || ncpuUDS == 0)) begin
+                        pendWriteHi <= !ncpuUDS;
+                        pendWriteLo <= !ncpuLDS;
+                        dataCacheHi <= cpuData[15:8];
+                        dataCacheLo <= cpuData[7:0];
                         // Valid CPU-VRAM cycle, so subtract constant $1380 from the 
                         // cpu address and store the result in addrCache register.
                         // Constant $1380 corresponds to $2700 shifted right by 1.
@@ -126,27 +109,39 @@ module cpusnoop (
                         //   offset:         0000 0000 0010 0111 0000 0000 = $002700
                         //   shifted offset: 0000 0000 0001 0011 1000 0000 = $001380
                         addrCache <= cpuAddr[13:0] - 14'h1380;
-
+                        
                         cycleState <= S2;
                     end else begin
-                        cycleState <= S1;
+                        cycleState <= S0;
                     end
                 end
                 S2 : begin
                     // wait for sequence
-                    if(pendWriteHi == 1 && pendWriteLo == 1 && seq < 5) begin
-                        // we have enough time to write both before the next VRAM read
-                        cycleState <= S3;
-                    end else if(seq < 6) begin
-                        // we have enough time to write the one pending before next VRAM read
-                        if(pendWriteLo == 0) begin
-                            cycleState <= S4;
-                        end else begin
+                    if(pendWriteHi == 1 && pendWriteLo == 1) begin
+                        if(seq < 5) begin
+                            // we have enough time to write both before the next VRAM read
                             cycleState <= S3;
+                        end else begin
+                            // we don't have enough time to write both. hold for now
+                            cycleState <= S2;
+                        end
+                    end else if(pendWriteHi == 1 || pendWriteLo == 1) begin
+                        if(seq < 6) begin
+                            // we have enough time for the pending write
+                            if(pendWriteLo == 0) begin
+                                // move on to write high byte
+                                cycleState <= S4;
+                            end else begin
+                                // move on to write low byte
+                                cycleState <= S3;
+                            end
+                        end else begin
+                            // not enough time for a write cycle. hold for now
+                            cycleState <= S2;
                         end
                     end else begin
-                        // no time for a write sequence, wait
-                        cycleState <= S2;
+                        // we shouldn't be here. Somehow we have slipped through without setting flags.
+                        cycleState <= S0;
                     end
                 end
                 S3 : begin
@@ -165,7 +160,6 @@ module cpusnoop (
                 end
                 S5 : begin
                     // wait for CPU to negate both ncpuUDS and ncpuLDS
-                    //if(ncpuUDS == 1 && ncpuLDS == 1) begin
                     if(cpuCycleEnded == 1) begin
                         cycleState <= S0;
                     end else begin
@@ -183,9 +177,9 @@ module cpusnoop (
     always_comb begin
         vramAddr[14:1] <= addrCache[13:0];
         if(cycleState == S4) begin
-            vramAddr[0] <= 1;
-        end else begin
             vramAddr[0] <= 0;
+        end else begin
+            vramAddr[0] <= 1;
         end
 
         if(cycleState == S3 || cycleState == S4) begin
@@ -203,99 +197,4 @@ module cpusnoop (
         end
     end
 
-/*
-    
-
-    // when cpu addresses the framebuffer, save the address
-    always @(negedge ncpuAS or negedge nReset) begin
-        if(nReset == 1'b0) begin
-            addrCache <= 0;
-        end else begin
-            // here we match our ramSize jumpers and constants to confirm
-            // the CPU is accessing the primary frame buffer
-            //if(cpuBufSel == 1'b1) begin
-            if(ramSize == cpuAddr[20:18] && cpuAddr[22:21] == 2'b00 && cpuAddr[17:14] == 4'b1111) begin
-                // We have a match, so subtract constant $1380 from the 
-                // cpu address and store the result in addrCache register.
-                // Constant $1380 corresponds to $2700 shifted right by 1.
-                // Once the selection bits above are masked out, we're left
-                // with buffer addresses starting with $2700
-                // e.g. with 4MB of RAM, fram buffer starts at $3FA700
-                //   buffer address: 0011 1111 1010 0111 0000 0000 = $3FA700
-                //   vram addr mask: 0000 0000 0011 1111 1111 1111 - $003FFF
-                //   vram address:   0000 0000 0010 0111 0000 0000 = $002700
-                // Since CPU is 16-bit and does not provide A0, our cpuAddr
-                // signals are shifted right by one, so we need to do the same
-                // to our offset before subtracting it from cpuAddr
-                //   offset:         0000 0000 0010 0111 0000 0000 = $002700
-                //   shifted offset: 0000 0000 0001 0011 1000 0000 = $001380
-                addrCache <= cpuAddr[13:0] - 14'h1380;
-            end
-        end
-    end
-
-    // when cpu addresses the framebuffer, save high byte
-    always @(negedge ncpuUDS or negedge nReset) begin
-        if(nReset == 1'b0) begin
-            dataCacheHi <= 8'h0;
-        end else begin
-            if(cpuBufSel == 1'b1 && cpuRnW == 1'b0) begin
-                dataCacheHi <= cpuData[15:8];
-            end
-        end
-    end
-
-    // when cpu addresses the framebuffer, save low byte
-    always @(negedge ncpuLDS or negedge nReset) begin
-        if(nReset == 1'b0) begin
-            dataCacheLo <= 8'h0;
-        end else begin
-            if(cpuBufSel == 1'b1 && cpuRnW == 1'b0) begin
-                dataCacheLo <= cpuData[7:0];
-            end
-        end
-    end
-
-    // set pending flags for cpu accesses & clear when that cycle comes back around
-    /*always @(negedge pixClock or negedge nReset) begin
-        if(nReset == 1'b0) begin
-            pendWriteLo <= 1'b0;
-            pendWriteHi <= 1'b0;
-        end else begin
-            if(cpuBufSel == 1'b1 && cpuRnW == 1'b0) begin
-                if(ncpuUDS == 1'b0) begin
-                    pendWriteHi <= 1'b1;
-                end
-                if(ncpuLDS == 1'b0) begin
-                    pendWriteLo <= 1'b1;
-                end
-            end else begin
-                if(seq == 1 || seq == 3 || seq == 5) begin
-                    pendWriteLo <= 1'b0;
-                end
-                if(seq == 2 || seq == 4 || seq == 6) begin
-                    pendWriteHi <= 1'b0;
-                end
-            end
-        end
-    end*/
-/*
-
-    always_comb begin
-        vramAddr[14:1] <= addrCache[13:0];
-        if(pendWriteLo == 1'b1 && (seq == 1 || seq == 3 || seq == 5)) begin
-            vramAddr[0] <= 1'b0;
-            nvramWE <= 1'b0;
-            vramDataOut <= dataCacheLo;
-        end else if(pendWriteHi == 1'b1 && (seq == 2 || seq == 4 || seq == 6)) begin
-            vramAddr[0] <= 1'b1;
-            nvramWE <= 1'b0;
-            vramDataOut <= dataCacheHi;
-        end else begin
-            vramAddr[0] <= 1'b0;
-            nvramWE <= 1'b1;
-            vramDataOut <= 8'h0;
-        end
-    end
-*/
 endmodule
