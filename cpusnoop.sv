@@ -22,6 +22,9 @@ module cpusnoop (
     output logic [14:0]     vramAddr,   // VRAM Address Bus
     output logic [7:0]      vramDataOut,// VRAM Data Bus Output
     output wire             nvramWE,    // VRAM Write strobe
+    output wire             nvramCE0,   // VRAM Main select
+    output wire             nvramCE1,   // VRAM Alt select
+    output wire             vidBufSelOut,// VRAM Video Buffer selection
     input logic [2:0]       ramSize     // CPU RAM size selection
 );
 
@@ -33,6 +36,8 @@ module cpusnoop (
     wire cpuBufSel;             // is CPU accessing frame buffer?
     logic [2:0] cycleState;     // state machine state
     reg cpuCycleEnded;          // mark cpu has ended its cycle
+    reg cpuCycleBufSel;         // which frame buffer was selected for the cpu cycle
+    reg vidBufSel;              // which frame buffer was selected for video output
 
     // define state machine states
     parameter
@@ -44,24 +49,25 @@ module cpusnoop (
         S5  =   5;
     
     // when cpu addresses the framebuffer, set our enable signal
-    /* framebuffer starts $5900 below the top of RAM
-     * ramSize is used to mask the cpuAddr bits [21:19] to select the amount
+    /* Main framebuffer starts $5900 below the top of RAM, alt frame buffer is
+     * $8000 below the main frame buffer
+     * ramSize is used to mask the CPU Address bits [21:19] to select the amount
      * of memory installed in the computer. Not all possible ramSize selections
      * are valid memory sizes when using 30-pin SIMMs in the Mac SE. 
      * They may be possible using PDS RAM expansion cards.
-     * ramSize  bufferStart     ramTop+1    ramSize  Valid?    Installed SIMMs
-     *    $7      $3fa700       $400000     4.0MB       Y   [ 1MB   1MB ][ 1MB   1MB ]
-     *    $6      $37a700       $380000     3.5MB       N
-     *    $5      $2fa700       $300000     3.0MB       N
-     *    $4      $27a700       $280000     2.5MB       Y   [ 1MB   1MB ][256kB 256kB]
-     *    $3      $1fa700       $200000     2.0MB       Y   [ 1MB   1MB ][ ---   --- ]
-     *    $2      $17a700       $180000     1.5MB       N
-     *    $1      $0fa700       $100000     1.0MB       Y   [256kB 256kB][256kB 256kB]
-     *    $0      $07a700       $080000     0.5MB       Y   [256kB 256kB][ ---   --- ]
+     * ramSize  mainBuffer  altBuffer     ramTop+1    ramSize  Valid?       Installed SIMMs
+     *    $7     $3fa700     $3f2700       $400000     4.0MB     Y     [ 1MB   1MB ][ 1MB   1MB ]
+     *    $6     $37a700     $372700       $380000     3.5MB     N
+     *    $5     $2fa700     $2f2700       $300000     3.0MB     N
+     *    $4     $27a700     $272700       $280000     2.5MB     Y     [ 1MB   1MB ][256kB 256kB]
+     *    $3     $1fa700     $1f2700       $200000     2.0MB     Y     [ 1MB   1MB ][ ---   --- ]
+     *    $2     $17a700     $172700       $180000     1.5MB     N  
+     *    $1     $0fa700     $0f2700       $100000     1.0MB     Y     [256kB 256kB][256kB 256kB]
+     *    $0     $07a700     $072700       $080000     0.5MB     Y     [256kB 256kB][ ---   --- ]
      */
     always_comb begin
         // remember cpuAddr is shifted right by one since 68000 does not output A0
-        if(ramSize == cpuAddr[20:18] && cpuAddr[22:21] == 2'b00 && cpuAddr[17:14] == 4'b1111) begin
+        if(ramSize == cpuAddr[20:18] && cpuAddr[22:21] == 2'b00 && cpuAddr[17:15] == 3'b111) begin
             cpuBufSel <= 1'b1;
         end else begin
             cpuBufSel <= 1'b0;
@@ -72,8 +78,13 @@ module cpusnoop (
     always @(negedge pixClock or negedge nReset) begin
         if(!nReset) cpuCycleEnded <= 0;
         else if(cycleState == S2) cpuCycleEnded <= 0;
-        else if(ncpuUDS == 1 && ncpuLDS == 1 && (cycleState == S3 || cycleState == S4 || cycleState == S5)) cpuCycleEnded <= 1;
-        else cpuCycleEnded <= cpuCycleEnded;
+        else if(ncpuUDS == 1 
+                    && ncpuLDS == 1 
+                    && (cycleState == S3 
+                        || cycleState == S4 
+                        || cycleState == S5)) begin
+            cpuCycleEnded <= 1;
+        end else cpuCycleEnded <= cpuCycleEnded;
     end
     
     // CPU Write to VRAM state machine
@@ -89,7 +100,11 @@ module cpusnoop (
             case (cycleState)
                 S0 : begin
                     // idle state, wait for valid address and ncpuAS asserted
-                    if(ncpuAS == 0 && cpuBufSel == 1 && cpuRnW == 0 && (ncpuLDS == 0 || ncpuUDS == 0)) begin
+                    if(ncpuAS == 0 
+                            && cpuBufSel == 1 
+                            && cpuRnW == 0 
+                            && (ncpuLDS == 0 
+                                || ncpuUDS == 0)) begin
                         pendWriteHi <= !ncpuUDS;
                         pendWriteLo <= !ncpuLDS;
                         dataCacheHi <= cpuData[15:8];
@@ -109,8 +124,25 @@ module cpusnoop (
                         //   offset:         0000 0000 0010 0111 0000 0000 = $002700
                         //   shifted offset: 0000 0000 0001 0011 1000 0000 = $001380
                         addrCache <= cpuAddr[13:0] - 14'h1380;
+                        // The next address bit selects which frame buffer the CPU
+                        // is writing to for this cycle. 1 = Main ; 0 = Alt
+                        // Invert & save for later
+                        cpuCycleBufSel <= !cpuAddr[14];
                         
                         cycleState <= S2;
+                    end else if(ncpuAS == 0 
+                                    && cpuRnW == 0 
+                                    && ncpuUDS == 0 
+                                    && cpuAddr[22:18] == 5'h1D 
+                                    && (cpuAddr[10:7] == 4'hF 
+                                        || cpuAddr[10:7] == 4'h1)) begin
+                        // the CPU is addressing VIA Port A. We need to check what
+                        // bit 6 is set to to determine which buffer is selected
+                        // for video output. 1 = Main ; 0 = Alt
+                        vidBufSel <= !cpuData[14];
+                        // now that we've saved the buffer selection, go to state
+                        // S5 to wait for the CPU to end the bus cycle.
+                        cycleState <= S5;
                     end else begin
                         cycleState <= S0;
                     end
@@ -189,10 +221,16 @@ module cpusnoop (
         end
 
         // Assert VRAM Write signal during CPU Cycle states S3 & S4
+        // Also assert VRAM chip enable signals based on which buffer the CPU
+        // addressed for the VRAM write cycle
         if(cycleState == S3 || cycleState == S4) begin
             nvramWE <= 0;
+            nvramCE0 <= cpuCycleBufSel;
+            nvramCE1 <= !cpuCycleBufSel;
         end else begin
             nvramWE <= 1;
+            nvramCE0 <= 1;
+            nvramCE1 <= 1;
         end
 
         // Output our internal data cache registers on CPU Cycle states S3 & S4
@@ -206,5 +244,7 @@ module cpusnoop (
             vramDataOut <= 0;
         end
     end
+
+    assign vidBufSelOut = vidBufSel;
 
 endmodule

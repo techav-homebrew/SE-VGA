@@ -18,6 +18,8 @@ module sevga (
     inout logic [7:0]       vramData,   // VRAM Data bus
     output wire             nvramOE,    // VRAM Read strobe
     output wire             nvramWE,    // VRAM Write strobe
+    output wire             nvramCE0,   // VRAM Main chip select signal
+    output wire             nvramCE1,   // VRAM Alt chip select signal
 
     input logic [23:1]      cpuAddr,    // CPU Address bus
     input logic [15:0]      cpuData,    // CPU Data bus
@@ -35,6 +37,9 @@ wire hSEActive;
 wire vActive;
 wire vSEActive;
 wire nvramWEpre;            // VRAM Write signal from cpu snoop
+wire nvramCE0pre;
+wire nvramCE1pre;
+wire vidBufSel;
 
 logic [14:0] vidVramAddr;
 logic [14:0] cpuVramAddr;
@@ -84,6 +89,9 @@ cpusnoop cpusnp(
     .vramAddr(cpuVramAddr),
     .vramDataOut(cpuVramData),
     .nvramWE(nvramWEpre),
+    .nvramCE0(nvramCE0pre),
+    .nvramCE1(nvramCE1pre),
+    .vidBufSelOut(vidBufSel),
     .ramSize(ramSize)
 );
 
@@ -106,6 +114,9 @@ always_comb begin
     end
     vidVramData <= vramData;
 end
+
+assign nvramCE0 = (nvramWEpre | nvramCE0pre) & (nvramOE | vidBufSel);
+assign nvramCE1 = (nvramWEpre | nvramCE1pre) & (nvramOE | !vidBufSel);
 
 assign nvramWE = nvramWEpre | pixClk;
 
