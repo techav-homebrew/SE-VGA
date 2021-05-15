@@ -842,11 +842,6 @@ SIGNAL("vramData[0]")
 	PARENT = "vramData";
 }
 
-GROUP("cpuAddr")
-{
-	MEMBERS = "cpuAddr[1]", "cpuAddr[2]", "cpuAddr[3]", "cpuAddr[4]", "cpuAddr[5]", "cpuAddr[6]", "cpuAddr[7]", "cpuAddr[8]", "cpuAddr[9]", "cpuAddr[10]", "cpuAddr[11]", "cpuAddr[12]", "cpuAddr[13]", "cpuAddr[14]", "cpuAddr[15]", "cpuAddr[16]", "cpuAddr[17]", "cpuAddr[18]", "cpuAddr[19]", "cpuAddr[20]", "cpuAddr[21]", "cpuAddr[22]", "cpuAddr[23]";
-}
-
 SIGNAL("cpusnoop:cpusnp|addrCache")
 {
 	VALUE_TYPE = NINE_LEVEL_BIT;
@@ -1194,6 +1189,31 @@ SIGNAL("cpusnoop:cpusnp|pendWriteLo")
 	WIDTH = 1;
 	LSB_INDEX = -1;
 	DIRECTION = REGISTERED;
+	PARENT = "";
+}
+
+GROUP("cpuAddr")
+{
+	MEMBERS = "cpuAddr[1]", "cpuAddr[2]", "cpuAddr[3]", "cpuAddr[4]", "cpuAddr[5]", "cpuAddr[6]", "cpuAddr[7]", "cpuAddr[8]", "cpuAddr[9]", "cpuAddr[10]", "cpuAddr[11]", "cpuAddr[12]", "cpuAddr[13]", "cpuAddr[14]", "cpuAddr[15]", "cpuAddr[16]", "cpuAddr[17]", "cpuAddr[18]", "cpuAddr[19]", "cpuAddr[20]", "cpuAddr[21]", "cpuAddr[22]", "cpuAddr[23]";
+}
+
+SIGNAL("nvramCE0")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = OUTPUT;
+	PARENT = "";
+}
+
+SIGNAL("nvramCE1")
+{
+	VALUE_TYPE = NINE_LEVEL_BIT;
+	SIGNAL_TYPE = SINGLE_BIT;
+	WIDTH = 1;
+	LSB_INDEX = -1;
+	DIRECTION = OUTPUT;
 	PARENT = "";
 }
 
@@ -2749,6 +2769,24 @@ TRANSITION_LIST("cpusnoop:cpusnp|pendWriteLo")
 	}
 }
 
+TRANSITION_LIST("nvramCE0")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL X FOR 33000.0;
+	}
+}
+
+TRANSITION_LIST("nvramCE1")
+{
+	NODE
+	{
+		REPEAT = 1;
+		LEVEL X FOR 33000.0;
+	}
+}
+
 DISPLAY_LINE
 {
 	CHANNEL = "cpuAddr";
@@ -3902,6 +3940,24 @@ DISPLAY_LINE
 	EXPAND_STATUS = COLLAPSED;
 	RADIX = Binary;
 	TREE_INDEX = 116;
+	TREE_LEVEL = 0;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "nvramCE0";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Binary;
+	TREE_INDEX = 117;
+	TREE_LEVEL = 0;
+}
+
+DISPLAY_LINE
+{
+	CHANNEL = "nvramCE1";
+	EXPAND_STATUS = COLLAPSED;
+	RADIX = Binary;
+	TREE_INDEX = 118;
 	TREE_LEVEL = 0;
 }
 

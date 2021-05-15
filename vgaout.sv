@@ -25,29 +25,18 @@ module vgaout (
 wire vidMuxOut; // pixel data shift out
 wire vidActive; // combined active video signal
 
-wire vgaShiftL1; // Load VRAM data into register
-wire vgaShiftL2; // Load VRAM data into shifter
-
-// connect module for video out shift register
+wire nVidLoad;  // Load VRAM data into shifter
 vgaShiftOut vOut(
     .nReset(nReset),
     .clk(pixClock),
-    .shiftEn(vidActive),
-    .nLoad1(vgaShiftL1),
-    .nLoad2(vgaShiftL2),
+    .nLoad(nVidLoad),
     .parIn(vramData),
     .out(vidMuxOut)
 );
 
 always_comb begin
-    // load VRAM data into register
-    if(hCount[2:0] == 0) vgaShiftL1 <= !pixClock;
-    else vgaShiftL1 <= 1;
-
-    // load VRAM data into shifter
-    if(hCount[2:0] == 0) vgaShiftL2 <= !pixClock;
-    else if(hCount[2:0] == 1) vgaShiftL2 <= pixClock;
-    else vgaShiftL2 <= 1;
+    if(hCount[2:0] == 0) nVidLoad <= 0;
+    else nVidLoad <= 1;
 
     // combined video active signal
     if(hSEActive == 1'b1 && vSEActive == 1'b1) begin
@@ -58,7 +47,7 @@ always_comb begin
 
     // video data output
     if(vidActive == 1'b1) begin
-        vidOut <= vidMuxOut;
+        vidOut <= ~vidMuxOut;
     end else begin
         vidOut <= 1'b0;
     end

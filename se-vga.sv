@@ -116,7 +116,7 @@ always_comb begin
 end
 
 assign nvramCE0 = (nvramWEpre | nvramCE0pre) & (nvramOE | vidBufSel);
-assign nvramCE1 = (nvramWEpre | nvramCE1pre) & (nvramOE | !vidBufSel);
+assign nvramCE1 = (nvramWEpre | nvramCE1pre) & (nvramOE | ~vidBufSel);
 
 assign nvramWE = nvramWEpre | pixClk;
 

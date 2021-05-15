@@ -11,6 +11,32 @@
     `define VGASHIFTOUT
 
 module vgaShiftOut (
+    input wire nReset, clk, nLoad,
+    input logic [7:0] parIn,
+    output wire out
+);
+
+reg [8:0] shiftReg;
+
+always @(negedge clk or negedge nReset) begin
+    if(!nReset) shiftReg <= 0;
+    else begin
+        if(!nLoad) begin
+            shiftReg[8] <= shiftReg[7];
+            shiftReg[7:0] <= parIn;
+        end else begin
+            shiftReg[8:1] <= shiftReg[7:0];
+            shiftReg[0] <= 0;
+        end
+    end
+end
+
+assign out = shiftReg[8];
+
+endmodule
+
+/*
+module vgaShiftOut (
     input wire nReset,
     input wire clk,
     input wire shiftEn,
@@ -53,5 +79,6 @@ module vgaShiftOut (
     // high-order bit of the shift register (second stage) is the serial output
     assign out = outReg[7];
 endmodule
+*/
 
 `endif
