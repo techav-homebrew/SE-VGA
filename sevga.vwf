@@ -1192,11 +1192,6 @@ SIGNAL("cpusnoop:cpusnp|pendWriteLo")
 	PARENT = "";
 }
 
-GROUP("cpuAddr")
-{
-	MEMBERS = "cpuAddr[1]", "cpuAddr[2]", "cpuAddr[3]", "cpuAddr[4]", "cpuAddr[5]", "cpuAddr[6]", "cpuAddr[7]", "cpuAddr[8]", "cpuAddr[9]", "cpuAddr[10]", "cpuAddr[11]", "cpuAddr[12]", "cpuAddr[13]", "cpuAddr[14]", "cpuAddr[15]", "cpuAddr[16]", "cpuAddr[17]", "cpuAddr[18]", "cpuAddr[19]", "cpuAddr[20]", "cpuAddr[21]", "cpuAddr[22]", "cpuAddr[23]";
-}
-
 SIGNAL("nvramCE0")
 {
 	VALUE_TYPE = NINE_LEVEL_BIT;
@@ -1215,6 +1210,11 @@ SIGNAL("nvramCE1")
 	LSB_INDEX = -1;
 	DIRECTION = OUTPUT;
 	PARENT = "";
+}
+
+GROUP("cpuAddr")
+{
+	MEMBERS = "cpuAddr[1]", "cpuAddr[2]", "cpuAddr[3]", "cpuAddr[4]", "cpuAddr[5]", "cpuAddr[6]", "cpuAddr[7]", "cpuAddr[8]", "cpuAddr[9]", "cpuAddr[10]", "cpuAddr[11]", "cpuAddr[12]", "cpuAddr[13]", "cpuAddr[14]", "cpuAddr[15]", "cpuAddr[16]", "cpuAddr[17]", "cpuAddr[18]", "cpuAddr[19]", "cpuAddr[20]", "cpuAddr[21]", "cpuAddr[22]", "cpuAddr[23]";
 }
 
 TRANSITION_LIST("cpuAddr[1]")
@@ -1979,8 +1979,8 @@ TRANSITION_LIST("vramData[7]")
 		LEVEL 1 FOR 40.0;
 		LEVEL Z FOR 240.0;
 		LEVEL 0 FOR 80.0;
-		LEVEL Z FOR 240.0;
-		LEVEL 0 FOR 80.0;
+		LEVEL Z FOR 280.0;
+		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 500.0;
 		LEVEL 0 FOR 420.0;
 		LEVEL 1 FOR 320.0;
@@ -2042,8 +2042,8 @@ TRANSITION_LIST("vramData[6]")
 		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 240.0;
 		LEVEL 1 FOR 80.0;
-		LEVEL Z FOR 240.0;
-		LEVEL 0 FOR 80.0;
+		LEVEL Z FOR 280.0;
+		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 500.0;
 		LEVEL 0 FOR 740.0;
 		LEVEL 1 FOR 320.0;
@@ -2105,8 +2105,8 @@ TRANSITION_LIST("vramData[5]")
 		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 240.0;
 		LEVEL 0 FOR 80.0;
-		LEVEL Z FOR 240.0;
-		LEVEL 1 FOR 80.0;
+		LEVEL Z FOR 280.0;
+		LEVEL 1 FOR 40.0;
 		LEVEL Z FOR 500.0;
 		LEVEL 0 FOR 100.0;
 		LEVEL 1 FOR 320.0;
@@ -2170,8 +2170,8 @@ TRANSITION_LIST("vramData[4]")
 		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 240.0;
 		LEVEL 1 FOR 80.0;
-		LEVEL Z FOR 240.0;
-		LEVEL 1 FOR 80.0;
+		LEVEL Z FOR 280.0;
+		LEVEL 1 FOR 40.0;
 		LEVEL Z FOR 500.0;
 		LEVEL 1 FOR 100.0;
 		LEVEL 0 FOR 1600.0;
@@ -2232,8 +2232,8 @@ TRANSITION_LIST("vramData[3]")
 		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 240.0;
 		LEVEL 0 FOR 80.0;
-		LEVEL Z FOR 240.0;
-		LEVEL 1 FOR 80.0;
+		LEVEL Z FOR 280.0;
+		LEVEL 1 FOR 40.0;
 		LEVEL Z FOR 500.0;
 		LEVEL 0 FOR 420.0;
 		LEVEL 1 FOR 640.0;
@@ -2298,8 +2298,8 @@ TRANSITION_LIST("vramData[2]")
 		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 240.0;
 		LEVEL 1 FOR 80.0;
-		LEVEL Z FOR 240.0;
-		LEVEL 1 FOR 80.0;
+		LEVEL Z FOR 280.0;
+		LEVEL 1 FOR 40.0;
 		LEVEL Z FOR 500.0;
 		LEVEL 1 FOR 740.0;
 		LEVEL 0 FOR 960.0;
@@ -2363,8 +2363,8 @@ TRANSITION_LIST("vramData[1]")
 		LEVEL 1 FOR 40.0;
 		LEVEL Z FOR 240.0;
 		LEVEL 0 FOR 80.0;
-		LEVEL Z FOR 240.0;
-		LEVEL 0 FOR 80.0;
+		LEVEL Z FOR 280.0;
+		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 500.0;
 		LEVEL 1 FOR 420.0;
 		LEVEL 0 FOR 320.0;
@@ -2430,8 +2430,8 @@ TRANSITION_LIST("vramData[0]")
 		LEVEL 1 FOR 40.0;
 		LEVEL Z FOR 240.0;
 		LEVEL 1 FOR 80.0;
-		LEVEL Z FOR 240.0;
-		LEVEL 0 FOR 80.0;
+		LEVEL Z FOR 280.0;
+		LEVEL 0 FOR 40.0;
 		LEVEL Z FOR 500.0;
 		LEVEL 0 FOR 420.0;
 		LEVEL 1 FOR 320.0;

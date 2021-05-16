@@ -42,7 +42,7 @@ module cpusnoop (
     // define state machine states
     parameter
         S0  =   0,
-        //S1  =   3'h1,
+        S1  =   1,
         S2  =   2,
         S3  =   3,
         S4  =   4,
@@ -67,7 +67,13 @@ module cpusnoop (
      */
     always_comb begin
         // remember cpuAddr is shifted right by one since 68000 does not output A0
-        if(ramSize == cpuAddr[20:18] && cpuAddr[22:21] == 2'b00 && cpuAddr[17:15] == 3'b111) begin
+        if(cpuAddr[22:21] == 2'b00                  // initial constant
+                && ramSize == cpuAddr[20:18]        // ram size selection
+                && cpuAddr[17:15] == 3'b111         // trailing constant
+                                                    // next bit is main/alt select
+                && (cpuAddr[13:0] >= 14'h1380       // bottom of buffer range (0x2700>>1)
+                    && cpuAddr[13:0] <= 14'h3e3f)   // top of buffer range (0x7C70>>1)
+                ) begin
             cpuBufSel <= 1'b1;
         end else begin
             cpuBufSel <= 1'b0;
@@ -134,8 +140,7 @@ module cpusnoop (
                                     && cpuRnW == 0 
                                     && ncpuUDS == 0 
                                     && cpuAddr[22:18] == 5'h1D 
-                                    && (cpuAddr[10:7] == 4'hF 
-                                        || cpuAddr[10:7] == 4'h1)) begin
+                                    && cpuAddr[11:7] == 5'h1F) begin
                         // the CPU is addressing VIA Port A. We need to check what
                         // bit 6 is set to to determine which buffer is selected
                         // for video output. 1 = Main ; 0 = Alt
@@ -149,37 +154,16 @@ module cpusnoop (
                 end
                 S2 : begin
                     // wait for sequence
-                    if(pendWriteHi == 1 && pendWriteLo == 1) begin
-                        if(seq < 6) begin
-                            // we have enough time to write both before the next VRAM read
-                            cycleState <= S3;
-                        end else begin
-                            // we don't have enough time to write both. hold for now
-                            cycleState <= S2;
-                        end
-                    end else if(pendWriteHi == 1 || pendWriteLo == 1) begin
-                        if(seq < 7) begin
-                            // we have enough time for the pending write
-                            if(pendWriteLo == 0) begin
-                                // move on to write high byte
-                                cycleState <= S4;
-                            end else begin
-                                // move on to write low byte
-                                cycleState <= S3;
-                            end
-                        end else begin
-                            // not enough time for a write cycle. hold for now
-                            cycleState <= S2;
-                        end
-                    end else begin
-                        // we shouldn't be here. Somehow we have slipped through without setting flags.
-                        cycleState <= S0;
-                    end
+                    
+                    if(pendWriteLo == 1 && !seq[0]) cycleState <= S3;
+                    else if (pendWriteHi ==1 && !seq[0]) cycleState <= S4;
+                    else if (pendWriteHi == 0 && pendWriteLo == 0) cycleState <= S0;    // in case something weird happens
+                    else cycleState <= S2;
                 end
                 S3 : begin
                     // write CPU low byte to VRAM
                     if(pendWriteHi == 1) begin
-                        cycleState <= S4;
+                        cycleState <= S1;   // move on to delay before second write cycle
                     end else begin
                         cycleState <= S5;
                     end
@@ -197,6 +181,11 @@ module cpusnoop (
                     end else begin
                         cycleState <= S5;
                     end
+                end
+                S1 : begin
+                    // delay moving to second write cycle
+                    if (!seq[0]) cycleState <= S4;
+                    else cycleState <= S1;
                 end
                 default: begin
                     // how did we end up here? reset to S0
