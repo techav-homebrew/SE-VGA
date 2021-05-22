@@ -84,11 +84,12 @@ module cpusnoop (
     always @(negedge pixClock or negedge nReset) begin
         if(!nReset) cpuCycleEnded <= 0;
         else if(cycleState == S2) cpuCycleEnded <= 0;
-        else if(ncpuUDS == 1 
-                    && ncpuLDS == 1 
+        else if(ncpuUDS && ncpuLDS
                     && (cycleState == S3 
                         || cycleState == S4 
-                        || cycleState == S5)) begin
+                        || cycleState == S5
+                        || cycleState == S1)
+                    ) begin
             cpuCycleEnded <= 1;
         end else cpuCycleEnded <= cpuCycleEnded;
     end
@@ -154,15 +155,16 @@ module cpusnoop (
                 end
                 S2 : begin
                     // wait for sequence
-                    
-                    if(pendWriteLo == 1 && !seq[0]) cycleState <= S3;
-                    else if (pendWriteHi ==1 && !seq[0]) cycleState <= S4;
-                    else if (pendWriteHi == 0 && pendWriteLo == 0) cycleState <= S0;    // in case something weird happens
+                    if(pendWriteLo && !seq[0]) cycleState <= S3;
+                    else if (pendWriteHi && !seq[0]) cycleState <= S4;
+                    else if (!pendWriteHi && !pendWriteLo) cycleState <= S0;    // in case something weird happens
                     else cycleState <= S2;
                 end
                 S3 : begin
                     // write CPU low byte to VRAM
-                    if(pendWriteHi == 1) begin
+                    if (seq == 0) begin
+                        cycleState <= S3;   // we shouldn't be here during a read cycle, so delay
+                    end else if(pendWriteHi == 1) begin
                         cycleState <= S1;   // move on to delay before second write cycle
                     end else begin
                         cycleState <= S5;
@@ -171,7 +173,11 @@ module cpusnoop (
                 end
                 S4 : begin
                     // write CPU high byte to VRAM
-                    cycleState <= S5;
+                    if (seq == 0) begin
+                        cycleState <= S4;   // we shouldn't be here during a read cycle, so delay
+                    end else begin
+                        cycleState <= S5;
+                    end
                     pendWriteHi <= 0;
                 end
                 S5 : begin
@@ -212,7 +218,7 @@ module cpusnoop (
         // Assert VRAM Write signal during CPU Cycle states S3 & S4
         // Also assert VRAM chip enable signals based on which buffer the CPU
         // addressed for the VRAM write cycle
-        if(cycleState == S3 || cycleState == S4) begin
+        if(seq != 0 && (cycleState == S3 || cycleState == S4)) begin
             nvramWE <= 0;
             nvramCE0 <= cpuCycleBufSel;
             nvramCE1 <= !cpuCycleBufSel;
