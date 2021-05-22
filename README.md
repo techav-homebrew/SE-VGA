@@ -1,9 +1,26 @@
 # SE-VGA
-Simple CPLD project to mirror the Mac SE video over VGA. No scaling is performed -- the Mac 512x342 video is displayed letterboxed (black borders) in a 640x480 frame.
+Simple CPLD project to mirror the Mac SE video over VGA. No scaling is performed -- the Mac 512x342 video is displayed letterboxed (black borders) in a 640x480 frame. Plugs into SE PDS slot and snoops writes to the frame buffer memory locations. Writes are cached and copied to VRAM.
 
 Circuit uses a single AFT1508AS-100AU CPLD, a pair of 256kbit (32kx8) 15ns SRAM, and a 25.175MHz can oscillator, along with some passives.
 
-Plugs into SE PDS slot and snoops writes to the frame buffer memory locations. Writes are cached and copied to VRAM.
+## Bill of Materials
+
+| Qty | Manufacturer    | Part No.           | Name               | Description                                   |
+|:---:|:----------------|:-------------------|:-------------------|:----------------------------------------------|
+|  2  | Renesas         | 71256SA12TPG       | VRAM-ALT, VRAM-MAIN| 32kx8 15ns SRAM                               | 
+|  1  | Microchip       | ATF1508AS-7AX100   | LOGIC              | ATF1508AS or EPM7128 CPLD                     |
+|  1  | CTS             | MXO45HS-3C-25M1750 | CLK                | 25.175MHz oscillator                          |
+|  1  | TE Connectivity | 650473-5           | PDS                | DIN 41612 Right-angle 3x32 pin male connector |
+|  5  |                 |                    | C1, C2, C3, C4, C5 | 0.1uF Decoupling Capacitor                    |
+|  2  |                 |                    | C6, C7             | 10uF Electrolytic Capacitor                   |
+|  2  |                 |                    | R7, R8, R9         | 4k7 pullup resistor (value not critical)      |
+|  3  |                 |                    | R1, R2, R3         | 470 ohm resistor                              |
+|  3  |                 |                    | R4, R5, R6         | 75 ohm resistor                               |
+|  1  |                 |                    | PGM                | 2x5 pin header for CPLD JTAG programming      |
+|  1  |                 |                    | VGA                | 6x1 pin header for VGA adapter                |
+|  1  |                 |                    | RAMSIZE            | 3x2 jumper                                    |
+
+## Frame Buffer Addressing
 
 The Mac SE primary framebuffer starts at 0x5900 below the top of RAM. Since it's not in a static location for every system, the system's memory configuration is needed. This is set by three ramSize jumpers, which mask CPU address bits 21, 20, 19. Not all possible ramSize selections are valid memory sizes when using 30-pin SIMMs in the Mac SE. In theory, these combinations could be possible when using PDS memory expansion cards, but this is unlikely. The chart below indicates the valid & invalid ramSize configurations and the corresponding installed SIMM combinations.
 
@@ -19,7 +36,7 @@ The Mac SE primary framebuffer starts at 0x5900 below the top of RAM. Since it's
 | 000   | 0x07a700       | 0x072700      | 0x080000          | 0.5MB  | `[256kB 256kB][ ---   --- ]` |
 
 ## CPLD Pin Assignments
-Logic uses nearly all available resources in the 128-macrocell CPLD.
+Logic uses nearly all available resources in the CPLD (104 of 128 macrocells).
 
 |signal|Direction|Pin|
 |---|---|---|
@@ -105,3 +122,13 @@ Logic uses nearly all available resources in the 128-macrocell CPLD.
 |TDI|Input|PIN_4|
 |TDO|Output|PIN_73|
 |TMS|Input|PIN_15
+
+## Known Issues
+First run schematic and gerbers used three pairs of resistor dividers for R, G, B output channels. A better approach would be to use a single divider and tie all three output channels together. Also 470 ohm is a bit too high, so the image is quite dark.
+
+The resistor footprints are too small for 1/4W parts. Might work with 1/8W parts.
+
+Timing for the SE window is a bit off. It appears to be starting the window a couple pixels early on the left, and it might be cutting off the last pixel or two on the right.
+
+## Wish List
+I would like to bump up the pixel clock to 65MHz and run the output video at 1024x768@60. This would allow the SE frame to be pixel doubled to 1024x684, which would only leave black bars on the top and bottom, instead of on all four sides. This could also be a useful starting point for a future project to output video for an early iPad display for units missing a CRT. 
