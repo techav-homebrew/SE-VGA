@@ -1,7 +1,7 @@
 # SE-VGA
 Simple CPLD project to mirror the Mac SE video over VGA. No scaling is performed -- the Mac 512x342 video is displayed letterboxed (black borders) in a 640x480 frame.
 
-Circuit uses a single AFT1508AS-100AU CPLD, 32kx8 15ns SRAM, and a 25.175MHz can oscillator, along with some passives.
+Circuit uses a single AFT1508AS-100AU CPLD, a pair of 256kbit (32kx8) 15ns SRAM, and a 25.175MHz can oscillator, along with some passives.
 
 Plugs into SE PDS slot and snoops writes to the frame buffer memory locations. Writes are cached and copied to VRAM.
 
@@ -19,7 +19,7 @@ The Mac SE primary framebuffer starts at 0x5900 below the top of RAM. Since it's
 | 000   | 0x07a700       | 0x072700      | 0x080000          | 0.5MB  | `[256kB 256kB][ ---   --- ]` |
 
 ## CPLD Pin Assignments
-Logic uses nearly all available resources in the 128-macrocell CPLD. Attempting to order the I/O pins in a manner more favorable for board layout would just waste precious few remaining resources. Fitter pinout stands.
+Logic uses nearly all available resources in the 128-macrocell CPLD.
 
 |signal|Direction|Pin|
 |---|---|---|
