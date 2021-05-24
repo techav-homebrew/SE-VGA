@@ -7,6 +7,10 @@
  * Pulls together all the smaller modules to form the SE-VGA adapter
  *****************************************************************************/
 
+`include "cpusnoop.sv"
+`include "vgaout.sv"
+`include "vgagen.sv"
+
 module sevga (
     input wire              nReset,     // System reset signal
     input wire              pixClk,     // 25.175MHz pixel clock
