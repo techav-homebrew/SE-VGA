@@ -1,0 +1,85 @@
+### SE-VGA
+### Pin Assignments - iCE40HX4k-TQ144
+### techav
+### 2021-05-23
+
+
+
+set_io cpuAddr[23] 	1
+set_io cpuAddr[22] 	2 
+set_io cpuAddr[21] 	3 
+set_io cpuAddr[20] 	4 
+set_io cpuAddr[19] 	7 
+set_io cpuAddr[18] 	8 
+set_io cpuAddr[17] 	9 
+set_io cpuAddr[16] 	10 
+set_io cpuAddr[15] 	11 
+set_io cpuAddr[14] 	12 
+set_io cpuAddr[13] 	15 
+set_io cpuAddr[12] 	16 
+set_io cpuAddr[11] 	17 
+set_io cpuAddr[10] 	18 
+set_io cpuAddr[9] 	19 
+set_io cpuAddr[8] 	22 
+set_io cpuAddr[7] 	23 
+set_io cpuAddr[6] 	24 
+set_io cpuAddr[5] 	25 
+set_io cpuAddr[4] 	26 
+set_io cpuAddr[3] 	28 
+set_io cpuAddr[2] 	29 
+set_io cpuAddr[1] 	31 
+set_io cpuData[15] 	32 
+set_io cpuData[14] 	33 
+set_io cpuData[13] 	34 
+set_io cpuData[12] 	37 
+set_io cpuData[11] 	38 
+set_io cpuData[10] 	39 
+set_io cpuData[9] 	41 
+set_io cpuData[8] 	42 
+set_io cpuData[7] 	43 
+set_io cpuData[6] 	44 
+set_io cpuData[5] 	45 
+set_io cpuData[4] 	47 
+set_io cpuData[3] 	48 
+set_io cpuData[2] 	55
+set_io cpuData[1] 	56 
+set_io cpuData[0] 	60 
+set_io cpuRnW 	61
+set_io nReset 	62 
+set_io ncpuAS 	73 
+set_io ncpuLDS 	74 
+set_io ncpuUDS 	75 
+set_io nhSync 	76 
+set_io nvSync 	78 
+set_io nvramCE0 	79 
+set_io nvramCE1 	80 
+set_io nvramOE 	81
+set_io nvramWE 	82 
+set_io pixClk 	83 
+set_io ramSize[2] 	84 
+set_io ramSize[1] 	85 
+set_io ramSize[0] 	87 
+set_io vidOut 	88
+set_io vramAddr[14] 	90 
+set_io vramAddr[13] 	91 
+set_io vramAddr[12] 	95 
+set_io vramAddr[11] 	96 
+set_io vramAddr[10] 	97 
+set_io vramAddr[9] 	98
+set_io vramAddr[8] 	99 
+set_io vramAddr[7] 	101 
+set_io vramAddr[6] 	102
+set_io vramAddr[5] 	104
+set_io vramAddr[4] 	105
+set_io vramAddr[3] 	106
+set_io vramAddr[2] 	107
+set_io vramAddr[1] 	110
+set_io vramAddr[0] 	112
+set_io vramData[7] 	113
+set_io vramData[6] 	114
+set_io vramData[5] 	115
+set_io vramData[4] 	116
+set_io vramData[3] 	117
+set_io vramData[2] 	118
+set_io vramData[1] 	119
+set_io vramData[0] 	120
