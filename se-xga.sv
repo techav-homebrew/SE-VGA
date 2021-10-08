@@ -183,14 +183,15 @@ end
 wire [14:0] writeAddr;
 reg vidBufSel;
 wire nvramCE0cpu, nvramCE1cpu, nvramWEcpu;
-reg [1:0] snoopCycleState;
+reg [2:0] snoopCycleState;
 
 // define state machine states
 parameter
-    S0  =   2'b00,  // idle
-    S1  =   2'b01,  // write high-order byte
-    S2  =   2'b11,  // write low-order byte
-    S3  =   2'b10;  // wait for CPU cycle end
+    S0  =   2'b000,   // idle
+    S1  =   2'b001,   // write high-order byte
+    S2  =   2'b011,   // write low-order byte
+    S3  =   2'b010,   // wait for CPU cycle end
+    S4  =   2'b110;   // VIA write cycle
 
 always @(negedge pixClk or negedge nReset) begin
     if(!nReset) begin snoopCycleState <= S0;
@@ -206,6 +207,9 @@ always @(negedge pixClk or negedge nReset) begin
                 // Otherwise, we'll stay here on S0
                 if(cpuBufAddr && tock && !ncpuUDS && vidSeq != 7) snoopCycleState <= S1;
                 else if(cpuBufAddr && tick && !ncpuLDS && vidSeq != 1) snoopCycleState <= S2;
+                else if(!ncpuAS && !ncpuUDS && !cpuRnW 
+                            && cpuAddr[22:18] == 5'h1D
+                            && cpuAddr[11:7]  == 5'h1F) snoopCycleState <= S4;
                 else snoopCycleState <= S0;
             end
             S1 : begin
@@ -224,6 +228,13 @@ always @(negedge pixClk or negedge nReset) begin
                 // waiting for CPU to end bus cycle 
                 if(!ncpuLDS || !ncpuUDS) snoopCycleState <= S3;
                 else snoopCycleState <= S0;
+            end
+            S4 : begin
+                // CPU is addressing VIA Port A. Bit 6 will select the active 
+                // screen buffer. 1=Main, 0=Alt
+                // After saving the selection, move to S3 to wait for cycle end
+                vidBufSel <= !cpuData[14];
+                snoopCycleState <= S3
             end
             default: begin
                 // shouldn't ever be here
@@ -245,7 +256,7 @@ always_comb begin
     else if(snoopCycleState == S2) vramData <= cpuData[7:0];
     else vramData <= 8'hZ;
 
-    writeAddr[13:0] <= cpuAddr[14:1];
+    writeAddr[13:0] <= cpuAddr[14:1] - 14'h1380;
     writeAddr[14] <= cpuBufSel;
 end
 
