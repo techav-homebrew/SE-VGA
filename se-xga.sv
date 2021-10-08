@@ -97,7 +97,7 @@ end
 logic [8:0] vidData;        // the video data we are displaying
 wire  [2:0] vidSeq;         // sequence counter, derived from hCount
 wire tick, tock;            // even/odd pulses of pixel clock divided by 2
-wire [14:0] readAddr;              // VRAM read address
+wire [14:0] readAddr;       // VRAM read address
 
 assign vidSeq = hCount[3:1];
 assign tick = !hCount[0];
@@ -138,79 +138,122 @@ end
 
 /******************************************************************************
  * CPU Bus Snooping
- * Watch the CPU bus for writes to the video buffer regions of memory, cache
- * the data internally until a write slot is available, then store in VRAM.
- * This is the last step, and it's a big one. Once this is in place and
- * operational, the adapter should be fully operational. 
+ * Watch the CPU bus for writes to the video buffer regions of memory and write
+ * that data to VRAM. VRAM write cycles can occur during vidSeq 1 through 7.
+ * High-order bytes are passed to VRAM on tick states and low-order bytes are 
+ * passed to VRAM on tock states. After the VRAM writes are complete, state
+ * machine waits for the CPU cycle to end before returning to idle.
  *****************************************************************************/
 
-// to remember for later:
-// vramCE[x] should be asserted when vidSeq == 0
-// vramOE should be asserted when vidSeq == 0 && vidActive
-// vramWE should be asserted on tock pulses of write sequences
-wire [14:0] writeAddr;
-reg vidBufSel;
-wire nvramCE0cpu, nvramCE1cpu;
-
-
-reg nvramWEpre;
-
-always @(negedge pixClk or negedge nReset) begin
-    if(nReset) begin
-        nvramWEpre <= 1;
-    end else if(!pixClk && vidSeq != 0 && (!ncpuLDS || !ncpuUDS) && tock) begin
-        
+// when cpu addresses the framebuffer, set our enable signal
+/* Main framebuffer starts $5900 below the top of RAM, alt frame buffer is
+ * $8000 below the main frame buffer
+ * ramSize is used to mask the CPU Address bits [21:19] to select the amount
+ * of memory installed in the computer. Not all possible ramSize selections
+ * are valid memory sizes when using 30-pin SIMMs in the Mac SE. 
+ * They may be possible using PDS RAM expansion cards.
+ * ramSize mainBuffer altBuffer ramTop+1 ramSize Valid?      Installed SIMMs
+ *    $7    $3fa700    $3f2700   $400000  4.0MB    Y    [ 1MB   1MB ][ 1MB   1MB ]
+ *    $6    $37a700    $372700   $380000  3.5MB    N
+ *    $5    $2fa700    $2f2700   $300000  3.0MB    N
+ *    $4    $27a700    $272700   $280000  2.5MB    Y    [ 1MB   1MB ][256kB 256kB]
+ *    $3    $1fa700    $1f2700   $200000  2.0MB    Y    [ 1MB   1MB ][ ---   --- ]
+ *    $2    $17a700    $172700   $180000  1.5MB    N  
+ *    $1    $0fa700    $0f2700   $100000  1.0MB    Y    [256kB 256kB][256kB 256kB]
+ *    $0    $07a700    $072700   $080000  0.5MB    Y    [256kB 256kB][ ---   --- ]
+ */
+wire cpuBufSel = ~cpuAddr[14];
+wire cpuBufAddr;
+always_comb begin
+    // remember cpuAddr is shifted right by one since 68000 does not output A0
+    if(!ncpuAS && !cpuRnW
+            && cpuAddr[22:21] == 2'b00          // initial constant
+            && ramSize == cpuAddr[20:18]        // ram size selection
+            && cpuAddr[17:15] == 3'b111         // trailing constant
+                                                // next bit is main/alt select
+            && (cpuAddr[13:0] >= 14'h1380       // bottom of buffer range (0x2700>>1)
+                && cpuAddr[13:0] <= 14'h3e3f)   // top of buffer range (0x7C70>>1)
+            ) begin
+        cpuBufAddr <= 1'b1;
+    end else begin
+        cpuBufAddr <= 1'b0;
     end
 end
 
-/*
-// link module that snoops cpu writes
-cpusnoop cpusnp(    
-    .nReset(nReset),
-    .pixClock(pixClk),
-    .seq(hCount[2:0]),
-    .cpuAddr(cpuAddr),
-    .cpuData(cpuData),
-    .ncpuAS(ncpuAS),
-    .ncpuUDS(ncpuUDS),
-    .ncpuLDS(ncpuLDS),
-    .cpuRnW(cpuRnW),
-    .cpuClk(cpuClk),
-    .vramAddr(cpuVramAddr),
-    .vramDataOut(cpuVramData),
-    .nvramWE(nvramWEpre),
-    .nvramCE0(nvramCE0pre),
-    .nvramCE1(nvramCE1pre),
-    .vidBufSelOut(vidBufSel),
-    .ramSize(ramSize)
-);
-*/
+wire [14:0] writeAddr;
+reg vidBufSel;
+wire nvramCE0cpu, nvramCE1cpu, nvramWEcpu;
+reg [1:0] snoopCycleState;
 
-/*
-cpusnoop cpusnp(
-    .nReset(nReset),
-    .pixClock(pixClk),
-    .seq(vidSeq),
-    .cpuAddr(cpuAddr),
-    .cpuData(cpuData),
-    .ncpuAS(ncpuAS),
-    .ncpuUDS(ncpuUDS),
-    .ncpuLDS(ncpuLDS),
-    .cpuRnW(cpuRnW),
-    .cpuClk(cpuClk),
-    .vramAddr(writeAddr),
-    .vramDataOut(),
-    .nvramWE(),
-    .nvramCE0(nvramCE0cpu),
-    .nvramCE1(nvramCE1cpu),
-    .vidBufSelOut(),
-    .ramSize(ramSize)
-);
-*/
+// define state machine states
+parameter
+    S0  =   2'b00,  // idle
+    S1  =   2'b01,  // write high-order byte
+    S2  =   2'b11,  // write low-order byte
+    S3  =   2'b10;  // wait for CPU cycle end
+
+always @(negedge pixClk or negedge nReset) begin
+    if(!nReset) begin snoopCycleState <= S0;
+    else begin
+        case (snoopCycleState)
+            S0 : begin
+                // idle, waiting for cpu to start a bus cycle
+                // if we're on a tock state and not about to go into a VRAM
+                // read cycle, and the CPU has asserted ncpuUDS, then we'll 
+                // move to S1 to handle the high-order byte write.
+                // If ncpuUDS is not asserted, but ncpuLDS is, and we're on a 
+                // tick state, then we'll skip on down to S2.
+                // Otherwise, we'll stay here on S0
+                if(cpuBufAddr && tock && !ncpuUDS && vidSeq != 7) snoopCycleState <= S1;
+                else if(cpuBufAddr && tick && !ncpuLDS && vidSeq != 1) snoopCycleState <= S2;
+                else snoopCycleState <= S0;
+            end
+            S1 : begin
+                // writing high-order byte to VRAM
+                // if we also need to write a low-order byte, then move to S2,
+                // else move to S3 to wait for the CPU cycle to end
+                if(!ncpuLDS) snoopCycleState <= S2;
+                else snoopCycleState <= S3;
+            end
+            S2 : begin
+                // writing low-order byte to VRAM
+                // this state will always be followed by S3
+                snoopCycleState <= S3;
+            end
+            S3 : begin
+                // waiting for CPU to end bus cycle 
+                if(!ncpuLDS || !ncpuUDS) snoopCycleState <= S3;
+                else snoopCycleState <= S0;
+            end
+            default: begin
+                // shouldn't ever be here
+                snoopCycleState <= S0;
+            end 
+        endcase
+    end
+end
+
+always_comb begin
+    if(snoopCycleState == S1) nvramCE0cpu <= 0;
+    else nvramCE0cpu <= 1;
+    if(snoopCycleState == S2) nvramCE1cpu <= 0;
+    else nvramCE1cpu <= 1;
+    if(snoopCycleState == S1 || snoopCycleState == S2) nvramWEcpu <= 0;
+    else nvramWEcpu <= 1;
+    
+    if(snoopCycleState == S1) vramData <= cpuData[15:8];
+    else if(snoopCycleState == S2) vramData <= cpuData[7:0];
+    else vramData <= 8'hZ;
+
+    writeAddr[13:0] <= cpuAddr[14:1];
+    writeAddr[14] <= cpuBufSel;
+end
+
+// Pull everything together
 
 always_comb begin
     if(nvramOE == 0) vramAddr <= readAddr;
-    else if(nvramWE == 0) vramAddr <= writeAddr;
+    else if(nvramWEcpu == 0) vramAddr <= writeAddr;
     else vramAddr <= 0;
 
     if(nvramOE == 0) begin
@@ -223,6 +266,8 @@ always_comb begin
         nvramCE0 <= 1;
         nvramCE1 <= 1;
     end
+
+    nvramWE <= nvramWEcpu;
 end
 
 endmodule
