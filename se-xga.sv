@@ -9,7 +9,7 @@
 
 module sevga (
     input wire              nReset,     // System reset signal
-    input wire              pixClk,     // 25.175MHz pixel clock
+    input wire              pixClk,     // 65MHz pixel clock
     output wire             nhSync,     // HSync signal
     output wire             nvSync,     // VSync signal
     output wire             vidOut,     // 1-bit Monochrome video signal
@@ -38,31 +38,33 @@ module sevga (
  *****************************************************************************/
 logic [10:0] hCount;    // 0..1343
 logic [9:0] vCount;     // 0..805
+wire nhSyncInner;
 
 // horizontal counter
 always @(negedge pixClk or negedge nReset) begin
     if(!nReset) hCount <= 0;
-    else if(!pixClk) begin
-        if(hCount < 1343) hCount <= hCount + 11'd1;
-        else hCount <= 0;
+    else begin
+        if(hCount < 11'd1343) hCount <= hCount + 11'd1;
+        else hCount <= 11'd0;
     end
 end
 
 // vertical counter
-always @(negedge nhSync or negedge nReset) begin
+always @(negedge nhSyncInner or negedge nReset) begin
     if(!nReset) vCount <= 0;
-    else if(!pixClk) begin
-        if(vCount < 805) vCount <= vCount + 10'd1;
-        else vCount <= 0;
+    else begin
+        if(vCount < 10'd805) vCount <= vCount + 10'd1;
+        else vCount <= 10'd0;
     end
 end
 
 // horizontal and vertical sync signals
 always_comb begin
-    if(hCount >= 1049 && hCount < 1184) nhSync <= 0;
-    else nhSync <= 1;
+    if(hCount >= 11'd1048 && hCount < 11'd1184) nhSyncInner <= 0;
+    else nhSyncInner <= 1;
+    nhSync <= nhSyncInner;
 
-    if(vCount >= 729 && vCount < 735) nvSync <= 0;
+    if(vCount >= 10'd729 && vCount < 10'd735) nvSync <= 0;
     else nvSync <= 1;
 end
 
@@ -78,7 +80,7 @@ wire hLoad;                 // load pixel data from vram when asserted
 assign vidActive = hActive & vActive;
 
 always_comb begin
-    if(hCount >= 1 && hCount < 1025) hActive <= 1;
+    if(hCount >= 0 && hCount < 1024) hActive <= 1;
     else hActive <= 0;
 
     if(vCount >= 0 && vCount < 684) vActive <= 1;
@@ -107,20 +109,19 @@ always @(negedge pixClk or negedge nReset) begin
     if(!nReset) vidData <= 0;
     else if(!pixClk) begin
         if(tock && hLoad && vidSeq == 3'd0) begin
-            // store the VRAM data in vidData[8:1]
-            //vidData[0] <= vidData[1]; // this should actually have already been done
-            vidData[8:1] <= vramData;
+            // store the VRAM data in vidData[7:0]
+            vidData[7:0] <= vramData;
         end else if(tick && hLoad) begin
             // shift vidData
-            vidData[7:0] <= vidData[8:1];
-            vidData[8] <= 0;
+            vidData[8:1] <= vidData[7:0];
+            vidData[0] <= 0;
         end
     end
 end
 
 always_comb begin
     // here is where the shifted video data actually gets output
-    if(vidActive) vidOut <= ~vidData[0];
+    if(vidActive) vidOut <= ~vidData[8];
     else vidOut <= 0;
 
     // vram read signal can be asserted here
@@ -162,17 +163,17 @@ end
  *    $1    $0fa700    $0f2700   $100000  1.0MB    Y    [256kB 256kB][256kB 256kB]
  *    $0    $07a700    $072700   $080000  0.5MB    Y    [256kB 256kB][ ---   --- ]
  */
-wire cpuBufSel = ~cpuAddr[14];
+wire cpuBufSel = ~cpuAddr[15];
 wire cpuBufAddr;
 always_comb begin
     // remember cpuAddr is shifted right by one since 68000 does not output A0
     if(!ncpuAS && !cpuRnW
-            && cpuAddr[22:21] == 2'b00          // initial constant
-            && ramSize == cpuAddr[20:18]        // ram size selection
-            && cpuAddr[17:15] == 3'b111         // trailing constant
+            && cpuAddr[23:22] == 2'b00          // initial constant
+            && ramSize == cpuAddr[21:19]        // ram size selection
+            && cpuAddr[18:16] == 3'b111         // trailing constant
                                                 // next bit is main/alt select
-            && (cpuAddr[13:0] >= 14'h1380       // bottom of buffer range (0x2700>>1)
-                && cpuAddr[13:0] <= 14'h3e3f)   // top of buffer range (0x7C70>>1)
+            && (cpuAddr[14:1] >= 14'h1380       // bottom of buffer range (0x2700>>1)
+                && cpuAddr[14:1] <= 14'h3e3f)   // top of buffer range (0x7C70>>1)
             ) begin
         cpuBufAddr <= 1'b1;
     end else begin
@@ -187,14 +188,14 @@ reg [2:0] snoopCycleState;
 
 // define state machine states
 parameter
-    S0  =   2'b000,   // idle
-    S1  =   2'b001,   // write high-order byte
-    S2  =   2'b011,   // write low-order byte
-    S3  =   2'b010,   // wait for CPU cycle end
-    S4  =   2'b110;   // VIA write cycle
+    S0  =   3'b000,   // idle
+    S1  =   3'b001,   // write high-order byte
+    S2  =   3'b011,   // write low-order byte
+    S3  =   3'b010,   // wait for CPU cycle end
+    S4  =   3'b110;   // VIA write cycle
 
 always @(negedge pixClk or negedge nReset) begin
-    if(!nReset) begin snoopCycleState <= S0;
+    if(!nReset) snoopCycleState <= S0;
     else begin
         case (snoopCycleState)
             S0 : begin
@@ -205,24 +206,26 @@ always @(negedge pixClk or negedge nReset) begin
                 // If ncpuUDS is not asserted, but ncpuLDS is, and we're on a 
                 // tick state, then we'll skip on down to S2.
                 // Otherwise, we'll stay here on S0
-                if(cpuBufAddr && tock && !ncpuUDS && vidSeq != 7) snoopCycleState <= S1;
-                else if(cpuBufAddr && tick && !ncpuLDS && vidSeq != 1) snoopCycleState <= S2;
+                if(cpuBufAddr && tock && !ncpuUDS && vidSeq != 7 && tock) snoopCycleState <= S1;
+                else if(cpuBufAddr && tick && !ncpuLDS && vidSeq != 1 && tock) snoopCycleState <= S2;
                 else if(!ncpuAS && !ncpuUDS && !cpuRnW 
-                            && cpuAddr[22:18] == 5'h1D
-                            && cpuAddr[11:7]  == 5'h1F) snoopCycleState <= S4;
+                            && cpuAddr[23:19] == 5'h1D
+                            && cpuAddr[12:8]  == 5'h1F) snoopCycleState <= S4;
                 else snoopCycleState <= S0;
             end
             S1 : begin
                 // writing high-order byte to VRAM
                 // if we also need to write a low-order byte, then move to S2,
                 // else move to S3 to wait for the CPU cycle to end
-                if(!ncpuLDS) snoopCycleState <= S2;
-                else snoopCycleState <= S3;
+                if(!ncpuLDS && tock) snoopCycleState <= S2;
+                else if(tock) snoopCycleState <= S3;
+                else snoopCycleState <= S1;
             end
             S2 : begin
                 // writing low-order byte to VRAM
                 // this state will always be followed by S3
-                snoopCycleState <= S3;
+                if(tock) snoopCycleState <= S3;
+                else snoopCycleState <= S2;
             end
             S3 : begin
                 // waiting for CPU to end bus cycle 
@@ -234,10 +237,10 @@ always @(negedge pixClk or negedge nReset) begin
                 // screen buffer. 1=Main, 0=Alt
                 // After saving the selection, move to S3 to wait for cycle end
                 vidBufSel <= !cpuData[14];
-                snoopCycleState <= S3
+                snoopCycleState <= S3;
             end
             default: begin
-                // shouldn't ever be here
+                // generally shouldn't be here
                 snoopCycleState <= S0;
             end 
         endcase
@@ -245,9 +248,9 @@ always @(negedge pixClk or negedge nReset) begin
 end
 
 always_comb begin
-    if(snoopCycleState == S1) nvramCE0cpu <= 0;
+    if(snoopCycleState == S1 && tick) nvramCE0cpu <= 0;
     else nvramCE0cpu <= 1;
-    if(snoopCycleState == S2) nvramCE1cpu <= 0;
+    if(snoopCycleState == S2 && tick) nvramCE1cpu <= 0;
     else nvramCE1cpu <= 1;
     if(snoopCycleState == S1 || snoopCycleState == S2) nvramWEcpu <= 0;
     else nvramWEcpu <= 1;
@@ -270,7 +273,7 @@ always_comb begin
     if(nvramOE == 0) begin
         nvramCE0 <= hCount[4];
         nvramCE1 <= ~hCount[4];
-    end else if(nvramWE == 0) begin
+    end else if(!nvramWEcpu) begin
         nvramCE0 <= nvramCE0cpu;
         nvramCE1 <= nvramCE1cpu;
     end else begin
@@ -278,7 +281,9 @@ always_comb begin
         nvramCE1 <= 1;
     end
 
-    nvramWE <= nvramWEcpu;
+    // make sure vram WE and OE signals aren't asserted simultaneously
+    if(!nvramWEcpu && nvramOE) nvramWE <= 0;
+    else nvramWE <= 1;
 end
 
 endmodule
