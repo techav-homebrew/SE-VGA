@@ -91,6 +91,179 @@ always_comb begin
 end
 
 /******************************************************************************
+ * Primary State Machine
+ * This is the primary state machine which runs the entire system, handling
+ * VRAM reads, VRAM writes, VIA writes, and idle states
+ *****************************************************************************/
+
+// define state machine states (Gray code)
+parameter
+    P0  =   4'b0000,    // VRAM Read 0
+    P1  =   4'b0001,    // VRAM Read 1
+    P2  =   4'b0011,    // Idle 0
+    P3  =   4'b0010,    // Idle 1
+    P4  =   4'b0110,    // VRAM Write Upper 0
+    P5  =   4'b0111,    // VRAM Write Upper 1
+    P6  =   4'b0101,    // VRAM Write Lower 0
+    P7  =   4'b0100,    // VRAM Write Lower 1
+    P8  =   4'b1100,    // VIA Write 0
+    P9  =   4'b1101,    // VIA Write 1
+    P10 =   4'b1111,    // undefined
+    P11 =   4'b1110,    // undefined
+    P12 =   4'b1010,    // undefined
+    P13 =   4'b1011,    // undefined
+    P14 =   4'b1001,    // undefined
+    P15 =   4'b1000;    // undefined
+
+logic [3:0] pState;
+
+always @(negedge pixClk or negedge nReset) begin
+    if(!nReset) pState <= P0;
+    else begin
+        case (pState)
+            P0  :   begin
+                // first VRAM read state, always move to P1
+                pState <= P1;
+            end
+            P1  :   begin
+                // move to appropriate VRAM write state or idle
+                if(cpuUWriteReq && !cpuUWriteSrv) pState <= P4;
+                else if(cpuLWriteReq && !cpuLWriteSrv) pState <= P6;
+                else if(cpuVIAReq && !cpuVIASrv) pState <= P8;
+                else pState <= P2;
+            end
+            P2  :   begin
+                // first idle state.
+                // we'll use this state to make sure we're synchronized with 
+                // the tick-tock clock states, so if we've made it here on a
+                // tock state, stay here until the next tick state.
+                if(tick) pState <= P3;
+                else pState <= P2;
+            end
+            P3  :   begin
+                // second idle state. Here is where things get fun.
+                case (vidSeq)
+                    7 : begin
+                        pState <= P0;
+                    end
+                    6 : begin
+                        if(cpuUWriteReq && !cpuUWriteSrv && !cpuLWriteReq) pState <= P4;
+                        else if(cpuLWriteReq && !cpuLWriteSrv) pState <= P6;
+                        else if(cpuVIAReq && !cpuVIASrv) pState <= P8;
+                        else pState <= P2;
+                    end
+                    default: begin
+                        if(cpuUWriteReq && !cpuUWriteSrv) pState <= P4;
+                        else if(cpuLWriteReq && !cpuLWriteSrv) pState <= P6;
+                        else if(cpuVIAReq && !cpuVIASrv) pState <= P8;
+                        else pState <= P2;
+                    end
+                endcase
+            end
+            P4  :   begin
+                // first VRAM Write Upper state, always move to P5
+                pState <= P5;
+            end
+            P5  :   begin
+                // second VRAM Write Upper state,
+                if(vidSeq == 7) pState <= P0;
+                else if(cpuBufAddr && !ncpuLDS) pState <= P6;
+                else pState <= P2;
+            end
+            P6  :   begin
+                // first VRAM Write Lower state, always move to P7
+                pState <= P7;
+            end
+            P7  :   begin
+                // second VRAM Write Lower state
+                if(vidSeq == 7) pState <= P0;
+                else pState <= P2;
+            end
+            P8  :   begin
+                // first VIA write state, always move to P9
+                pState <= P9;
+            end
+            P9  :   begin
+                // second VIA write state
+                vidBufSel <= ~cpuData[14];
+                if(vidSeq == 7) pState <= P0;
+                else pState <= P2;
+            end
+            default: begin
+                // how did we end up here? We need to align with the sequence 
+                // counter before we move to S0
+                if(vidSeq == 7 && tock) pState <= P0;
+                else if(tick) pState <= P3;
+                else pState <= P2;
+            end
+        endcase
+    end
+end
+
+// primary signal combination, based on the state machine above
+always_comb begin
+    // VRAM Read strobe
+    if((pState == P0 || pState == P1) && vidActive) nvramOE <= 0;
+    else nvramOE <= 1;
+
+    // VRAM Write strobe
+    if(pState == P4 || pState == P6) nvramWE <= 0;
+    else nvramWE <= 1;
+
+    // VRAM Chip Enable signals
+    case(pState)
+        P0, P1 : begin
+            if(vidActive) begin
+                nvramCE0 <= hCount[4];
+                nvramCE1 <= ~hCount[4];
+            end else begin
+                nvramCE0 <= 1;
+                nvramCE1 <= 1;
+            end
+        end
+        P4, P5 : begin
+            nvramCE0 <= 0;
+            nvramCE1 <= 1;
+        end
+        P6, P7 : begin
+            nvramCE0 <= 1;
+            nvramCE1 <= 0;
+        end
+        default: begin
+            nvramCE0 <= 1;
+            nvramCE1 <= 1;
+        end
+    endcase
+
+    // VRAM Address bus
+    case(pState)
+        P0, P1 : begin
+            if(hLoad) begin
+                vramAddr[14] <= vidBufSel;
+                vramAddr[13:5] <= vCount[9:1];
+                vramAddr[4:0] <= hCount[9:5];
+            end else begin
+                vramAddr <= 0;
+            end
+        end
+        P4, P5, P6, P7 : begin
+            vramAddr[14] <= cpuBufSel;
+            vramAddr[13:0] <= cpuAddr[14:1] - 14'h1380;
+        end
+        default: begin
+            vramAddr <= 0;
+        end
+    endcase
+
+    // VRAM Data bus
+    case(pState)
+        P4, P5 : vramData <= cpuData[15:8];
+        P6, P7 : vramData <= cpuData[7:0];
+        default: vramData <= 8'hZ;
+    endcase
+end
+
+/******************************************************************************
  * Video Output Sequencing
  * Here is the primary video output shift register sequencing.
  * With these functions in place, it should be possible to strap the VRAM data
@@ -99,16 +272,20 @@ end
 logic [8:0] vidData;        // the video data we are displaying
 wire  [2:0] vidSeq;         // sequence counter, derived from hCount
 wire tick, tock;            // even/odd pulses of pixel clock divided by 2
-wire [14:0] readAddr;       // VRAM read address
 
 assign vidSeq = hCount[3:1];
 assign tick = !hCount[0];
 assign tock = hCount[0];
 
+// for some reason changing this function to use pState==P1 instead of the old
+// tock && vidSeq==0 caused utilization to jump up 10 macrocells, and the 
+// monitor reported sync out of range. No idea what happened there so we'll 
+// leave this function as it is, since it seems to be working. 
 always @(negedge pixClk or negedge nReset) begin
     if(!nReset) vidData <= 0;
-    else if(!pixClk) begin
+    else begin
         if(tock && hLoad && vidSeq == 3'd0) begin
+        //if(pState == P1 && hLoad) begin
             // store the VRAM data in vidData[7:0]
             vidData[7:0] <= vramData;
         end else if(tick && hLoad) begin
@@ -123,17 +300,6 @@ always_comb begin
     // here is where the shifted video data actually gets output
     if(vidActive) vidOut <= ~vidData[8];
     else vidOut <= 0;
-
-    // vram read signal can be asserted here
-    if(vidActive && vidSeq == 3'd0) nvramOE <= 0;
-    else nvramOE <= 1;
-
-    // we'll be interleaving VRAM accesses, so the highest address bit will be
-    // used to select between Main & Aux video buffers.
-    // hCount[4] will be used to select between SRAM chips
-    readAddr[14] <= vidBufSel;
-    readAddr[13:5] <= vCount[9:1];
-    readAddr[4:0] <= hCount[9:5];
 end
 
 
@@ -146,7 +312,6 @@ end
  * machine waits for the CPU cycle to end before returning to idle.
  *****************************************************************************/
 
-// when cpu addresses the framebuffer, set our enable signal
 /* Main framebuffer starts $5900 below the top of RAM, alt frame buffer is
  * $8000 below the main frame buffer
  * ramSize is used to mask the CPU Address bits [21:19] to select the amount
@@ -163,8 +328,15 @@ end
  *    $1    $0fa700    $0f2700   $100000  1.0MB    Y    [256kB 256kB][256kB 256kB]
  *    $0    $07a700    $072700   $080000  0.5MB    Y    [256kB 256kB][ ---   --- ]
  */
+
+// keep track of pending CPU write requests and whether they have been serviced
+wire cpuUWriteReq, cpuLWriteReq, cpuVIAReq;
+reg  cpuUWriteSrv, cpuLWriteSrv, cpuVIASrv;
 wire cpuBufSel = ~cpuAddr[15];
 wire cpuBufAddr;
+reg vidBufSel;
+
+// these are some helpful signals that shortcut the CPU buffer & VIA addresses
 always_comb begin
     // remember cpuAddr is shifted right by one since 68000 does not output A0
     if(!ncpuAS && !cpuRnW
@@ -179,111 +351,45 @@ always_comb begin
     end else begin
         cpuBufAddr <= 1'b0;
     end
+
+    if(cpuBufAddr && !ncpuUDS) cpuUWriteReq <= 1;
+    else cpuUWriteReq <= 0;
+    if(cpuBufAddr && !ncpuLDS) cpuLWriteReq <= 1;
+    else cpuLWriteReq <= 0;
+
+    if(!ncpuAS && !cpuRnW && !ncpuUDS
+            && cpuAddr[23:19] == 5'h1D
+            && cpuAddr[12:8]  == 5'h1F) cpuVIAReq <= 1;
+    else cpuVIAReq <= 0;
 end
 
-wire [14:0] writeAddr;
-reg vidBufSel;
-wire nvramCE0cpu, nvramCE1cpu, nvramWEcpu;
-reg [2:0] snoopCycleState;
-
-// define state machine states
-parameter
-    S0  =   3'b000,   // idle
-    S1  =   3'b001,   // write high-order byte
-    S2  =   3'b011,   // write low-order byte
-    S3  =   3'b010,   // wait for CPU cycle end
-    S4  =   3'b110;   // VIA write cycle
-
-always @(negedge pixClk or negedge nReset) begin
-    if(!nReset) snoopCycleState <= S0;
-    else begin
-        case (snoopCycleState)
-            S0 : begin
-                // idle, waiting for cpu to start a bus cycle
-                // if we're on a tock state and not about to go into a VRAM
-                // read cycle, and the CPU has asserted ncpuUDS, then we'll 
-                // move to S1 to handle the high-order byte write.
-                // If ncpuUDS is not asserted, but ncpuLDS is, and we're on a 
-                // tick state, then we'll skip on down to S2.
-                // Otherwise, we'll stay here on S0
-                if(cpuBufAddr && tock && !ncpuUDS && vidSeq != 7 && tock) snoopCycleState <= S1;
-                else if(cpuBufAddr && tick && !ncpuLDS && vidSeq != 1 && tock) snoopCycleState <= S2;
-                else if(!ncpuAS && !ncpuUDS && !cpuRnW 
-                            && cpuAddr[23:19] == 5'h1D
-                            && cpuAddr[12:8]  == 5'h1F) snoopCycleState <= S4;
-                else snoopCycleState <= S0;
-            end
-            S1 : begin
-                // writing high-order byte to VRAM
-                // if we also need to write a low-order byte, then move to S2,
-                // else move to S3 to wait for the CPU cycle to end
-                if(!ncpuLDS && tock) snoopCycleState <= S2;
-                else if(tock) snoopCycleState <= S3;
-                else snoopCycleState <= S1;
-            end
-            S2 : begin
-                // writing low-order byte to VRAM
-                // this state will always be followed by S3
-                if(tock) snoopCycleState <= S3;
-                else snoopCycleState <= S2;
-            end
-            S3 : begin
-                // waiting for CPU to end bus cycle 
-                if(!ncpuLDS || !ncpuUDS) snoopCycleState <= S3;
-                else snoopCycleState <= S0;
-            end
-            S4 : begin
-                // CPU is addressing VIA Port A. Bit 6 will select the active 
-                // screen buffer. 1=Main, 0=Alt
-                // After saving the selection, move to S3 to wait for cycle end
-                vidBufSel <= !cpuData[14];
-                snoopCycleState <= S3;
-            end
-            default: begin
-                // generally shouldn't be here
-                snoopCycleState <= S0;
-            end 
-        endcase
-    end
-end
-
-always_comb begin
-    if(snoopCycleState == S1 && tick) nvramCE0cpu <= 0;
-    else nvramCE0cpu <= 1;
-    if(snoopCycleState == S2 && tick) nvramCE1cpu <= 0;
-    else nvramCE1cpu <= 1;
-    if(snoopCycleState == S1 || snoopCycleState == S2) nvramWEcpu <= 0;
-    else nvramWEcpu <= 1;
-    
-    if(snoopCycleState == S1) vramData <= cpuData[15:8];
-    else if(snoopCycleState == S2) vramData <= cpuData[7:0];
-    else vramData <= 8'hZ;
-
-    writeAddr[13:0] <= cpuAddr[14:1] - 14'h1380;
-    writeAddr[14] <= cpuBufSel;
-end
-
-// Pull everything together
-
-always_comb begin
-    if(nvramOE == 0) vramAddr <= readAddr;
-    else if(nvramWEcpu == 0) vramAddr <= writeAddr;
-    else vramAddr <= 0;
-
-    if(nvramOE == 0) begin
-        nvramCE0 <= hCount[4];
-        nvramCE1 <= ~hCount[4];
-    end else if(!nvramWEcpu) begin
-        nvramCE0 <= nvramCE0cpu;
-        nvramCE1 <= nvramCE1cpu;
+// if there's an active CPU request and we've reached the state for servicing
+// that CPU request, then set a flag to mark that we have serviced it
+always @(posedge pixClk or posedge ncpuAS) begin
+    if(ncpuAS) begin
+        cpuUWriteSrv <= 0;
+        cpuLWriteSrv <= 0;
+        cpuVIASrv    <= 0;
     end else begin
-        nvramCE0 <= 1;
-        nvramCE1 <= 1;
+        if(ncpuAS) begin
+            cpuUWriteSrv <= 0;
+            cpuLWriteSrv <= 0;
+            cpuVIASrv    <= 0;
+        end else begin
+            if(cpuUWriteReq && pState == P4) cpuUWriteSrv <= 1;
+            if(cpuLWriteReq && pState == P6) cpuLWriteSrv <= 1;
+            if(cpuVIAReq    && pState == P8) cpuVIASrv    <= 1;
+        end
     end
-
-    // make sure vram WE and OE signals aren't asserted simultaneously
-    if(!nvramWEcpu && nvramOE) nvramWE <= 0;
-    else nvramWE <= 1;
 end
+
+// when servicing a CPU VIA request, read the CPU data bus to set the video
+// buffer selection bit. Main: 1, Alt: 0
+/*always @(posedge pixClk or negedge nReset) begin
+    if(!nReset) vidBufSel <= 1;
+    else if(pState == P8) begin
+        vidBufSel <= ~cpuData[14];
+    end
+end*/
 
 endmodule
