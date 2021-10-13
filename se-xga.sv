@@ -52,7 +52,8 @@ end
 
 // horizontal and vertical sync signals
 always_comb begin
-    if(hCount >= 11'd1048 && hCount < 11'd1184) nhSyncInner <= 0;
+    //if(hCount >= 11'd1048 && hCount < 11'd1184) nhSyncInner <= 0;
+    if(hCount >= 11'd1052 && hCount < 11'd1187) nhSyncInner <= 0;
     else nhSyncInner <= 1;
     nhSync <= nhSyncInner;
 
@@ -72,7 +73,7 @@ wire hLoad;                 // load pixel data from vram when asserted
 assign vidActive = hActive & vActive;
 
 always_comb begin
-    if(hCount >= 0 && hCount < 1024) hActive <= 1;
+    if(hCount >= 3 && hCount < 1027) hActive <= 1;
     else hActive <= 0;
 
     if(vCount >= 0 && vCount < 684) vActive <= 1;
@@ -181,12 +182,12 @@ always_comb begin
         end
         S3, S4: begin
             // address bus for upper write cycles
-            vramAddr[14:1] <= cpuAddr[14:1] - 14'h1380;
+            vramAddr[14:1] <= cpuAddrShift;
             vramAddr[0] <= 0;
         end
         S5, S6: begin
             // address bus for lower write cycles
-            vramAddr[14:1] <= cpuAddr[14:1] - 14'h1380;
+            vramAddr[14:1] <= cpuAddrShift;
             vramAddr[0] <= 1;
         end
         default: begin
@@ -210,8 +211,6 @@ end
  * signals and see the strapped pattern output on screen.
  *****************************************************************************/
 logic [8:0] vidData;        // the video data we are displaying
-//wire  [2:0] vidSeq;         // sequence counter, derived from hCount
-//wire tick, tock;            // even/odd pulses of pixel clock divided by 2
 
 // output shift register
 always @(posedge pixClk) begin
@@ -221,7 +220,7 @@ always @(posedge pixClk) begin
     end else if(!hCount[0] && vidActive) begin
         // shift out video data
         vidData[8:1] <= vidData[7:0];
-        vidData[0] <= 0;
+        vidData[0] <= 1;
     end
 end
 
@@ -263,9 +262,15 @@ reg  cpuUWriteSrv, cpuLWriteSrv, cpuVIASrv;
 wire cpuBufSel;
 wire cpuBufAddr;
 reg vidBufSel;
+wire [13:0] cpuAddrShift = cpuAddr[14:1] - 14'h1380;
+wire cpuBufRange;
 
 // these are some helpful signals that shortcut the CPU buffer & VIA addresses
 always_comb begin
+    /*if(cpuAddr[14:1] >= 14'h1380
+        && cpuAddr[14:1] < 14'h3E40) cpuBufRange <= 1;
+    else cpuBufRange <= 0;*/
+    cpuBufRange <= (cpuAddr[14:1] >= 14'h1380) & (cpuAddr[14:1] < 14'h3E40);
     if(!ncpuAS && !cpuRnW
             && !cpuAddr[23] && !cpuAddr[22]     // first two bits always 0
             && !(cpuAddr[21] ^ ramSize[2])      // compare with RAM Size bits
@@ -273,7 +278,7 @@ always_comb begin
             && !(cpuAddr[19] ^ ramSize[0])
             && cpuAddr[18] && cpuAddr[17]       // next three bits always 1
             && cpuAddr[16]                      // skip 15, it selects buffers
-            && (cpuAddr[14] || cpuAddr[13])     // if neither 13|14 then not buffer
+            && cpuBufRange                      // only select buffer addresses
     ) begin
         cpuBufAddr <= 1;
     end else begin
