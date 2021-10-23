@@ -1,24 +1,28 @@
 # SE-VGA
-Simple CPLD project to mirror the Mac SE video over VGA. No scaling is performed -- the Mac 512x342 video is displayed letterboxed (black borders) in a 640x480 frame. Plugs into SE PDS slot and snoops writes to the frame buffer memory locations. Writes are cached and copied to VRAM.
+Simple CPLD project to mirror the Mac SE video over VGA. The image is pixel-doubled to 1024x684 and displayed letterboxed (black borders) in a 1024x768 video frame. Device snoops writes to the frame buffer memory locations and caches the data to its own VRAM for display. Plugs into the PDS slot in a Mac SE, or plugs in place of the CPU on Mac SE, Plus, or 512k models (128k Mac could be made to work with some adjustment to the CPLD configuration, but is not a configuration supported by the memory selection jumpers).
 
-Circuit uses a single AFT1508AS-100AU CPLD, a pair of 256kbit (32kx8) 15ns SRAM, and a 25.175MHz can oscillator, along with some passives.
+Circuit uses a single AFT1508AS-7AX100 CPLD, a pair of 256kbit (32kx8) 15ns or faster SRAM, a 13MHz crystal with 5x clock multiplier for 65MHz pixel clock, along with some passives.
 
 ## Bill of Materials
 
 | Qty | Manufacturer    | Part No.           | Name               | Description                                   |
 |:---:|:----------------|:-------------------|:-------------------|:----------------------------------------------|
-|  2  | Renesas         | 71256SA12TPG       | VRAM-ALT, VRAM-MAIN| 32kx8 15ns SRAM                               | 
-|  1  | Microchip       | ATF1508AS-7AX100   | LOGIC              | ATF1508AS or EPM7128 CPLD                     |
-|  1  | CTS             | MXO45HS-3C-25M1750 | CLK                | 25.175MHz oscillator                          |
+|  2  | ISSI            | IS61C256AL-12TLI   | VRAM-ALT, VRAM-MAIN| 32kx8 12ns SRAM, TSOP-28                      | 
+|  1  | Microchip       | ATF1508AS-7AX100   | LOGIC              | ATF1508AS or EPM7128 CPLD, TQFP-100           |
+|  1  | Renesas / IDT   | 511MLF             | CLK                | Programmable Clock Multiplier, SO-8           |
+|  1  | ECS             | ECS-130-20-46X     | XTAL               | 13MHz Crystal, HC-46X or HC-49UP              |
 |  1  | TE Connectivity | 650473-5           | PDS                | DIN 41612 Right-angle 3x32 pin male connector |
-|  5  |                 |                    | C1, C2, C3, C4, C5 | 0.1uF Decoupling Capacitor                    |
+|  5  |                 |                    | C1, C2, C3, C4, C5 | 0.1uF Decoupling Capacitor, 0805              |
 |  2  |                 |                    | C6, C7             | 10uF Electrolytic Capacitor                   |
-|  2  |                 |                    | R7, R8, R9         | 4k7 pullup resistor (value not critical)      |
-|  3  |                 |                    | R1, R2, R3         | 470 ohm resistor                              |
-|  3  |                 |                    | R4, R5, R6         | 75 ohm resistor                               |
+|  2  |                 |                    | C8, C9             | 20pF Capacitor, 0805                          |
+|  2  |                 |                    | R3, R4, R5         | 10k pullup resistor, 0805 or axial            |
+|  3  |                 |                    | R2                 | 460 ohm resistor, 0805 or axial               |
+|  3  |                 |                    | R1                 | 75 ohm resistor, 0805 or axial                |
 |  1  |                 |                    | PGM                | 2x5 pin header for CPLD JTAG programming      |
-|  1  |                 |                    | VGA                | 6x1 pin header for VGA adapter                |
+|  1  |                 |                    | VGA                | 2x5 pin header for VGA adapter                |
 |  1  |                 |                    | RAMSIZE            | 3x2 jumper                                    |
+|  1  |                 |                    | BRD                | 64-pin DIP header, male                       |
+|  1  |                 |                    | CPU                | 64-pin DIP socket, female                     |
 
 ## Frame Buffer Addressing
 
@@ -124,11 +128,11 @@ Logic uses nearly all available resources in the CPLD (104 of 128 macrocells).
 |TMS|Input|PIN_15
 
 ## Known Issues
-First run schematic and gerbers used three pairs of resistor dividers for R, G, B output channels. A better approach would be to use a single divider and tie all three output channels together. Also 470 ohm is a bit too high, so the image is quite dark.
+~~First run schematic and gerbers used three pairs of resistor dividers for R, G, B output channels. A better approach would be to use a single divider and tie all three output channels together. Also 470 ohm is a bit too high, so the image is quite dark.~~ Removed extraneous resistor dividers. Changed 470ohm resistor to 460.
 
-The resistor footprints are too small for 1/4W parts. Might work with 1/8W parts.
+~~The resistor footprints are too small for 1/4W parts. Might work with 1/8W parts.~~ Added footprints for 0805 resistors. 
 
 Timing for the SE window is a bit off. It appears to be starting the window a couple pixels early on the left, and it might be cutting off the last pixel or two on the right.
 
 ## Wish List
-I would like to bump up the pixel clock to 65MHz and run the output video at 1024x768@60. This would allow the SE frame to be pixel doubled to 1024x684, which would only leave black bars on the top and bottom, instead of on all four sides. This could also be a useful starting point for a future project to output video for an early iPad display for units missing a CRT. 
+~~I would like to bump up the pixel clock to 65MHz and run the output video at 1024x768@60. This would allow the SE frame to be pixel doubled to 1024x684, which would only leave black bars on the top and bottom, instead of on all four sides. This could also be a useful starting point for a future project to output video for an early iPad display for units missing a CRT. ~~
