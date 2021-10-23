@@ -1,5 +1,5 @@
 # SE-VGA
-Simple CPLD project to mirror the Mac SE video over VGA. The image is pixel-doubled to 1024x684 and displayed letterboxed (black borders) in a 1024x768 video frame. Device snoops writes to the frame buffer memory locations and caches the data to its own VRAM for display. Plugs into the PDS slot in a Mac SE, or plugs in place of the CPU on Mac SE, Plus, or 512k models (128k Mac could be made to work with some adjustment to the CPLD configuration, but is not a configuration supported by the memory selection jumpers).
+Simple CPLD project to mirror the Mac SE video over VGA. The image is pixel-doubled to 1024x684 and displayed letterboxed (black borders) in a 1024x768 video frame. Device snoops writes to the frame buffer memory locations and caches the data to its own VRAM for display. Plugs into the PDS slot in a Mac SE, or plugs in place of the CPU on Mac SE, Plus, or 512k models (128k Mac could be made to work with some adjustment to the CPLD configuration, but is not a configuration supported by the memory selection jumpers). Tested and working on a Mac SE and a Mac Plus, both with 4MB of RAM.
 
 Circuit uses a single AFT1508AS-7AX100 CPLD, a pair of 256kbit (32kx8) 15ns or faster SRAM, a 13MHz crystal with 5x clock multiplier for 65MHz pixel clock, along with some passives.
 
@@ -26,7 +26,7 @@ Circuit uses a single AFT1508AS-7AX100 CPLD, a pair of 256kbit (32kx8) 15ns or f
 
 ## Frame Buffer Addressing
 
-The Mac SE primary framebuffer starts at 0x5900 below the top of RAM. Since it's not in a static location for every system, the system's memory configuration is needed. This is set by three ramSize jumpers, which mask CPU address bits 21, 20, 19. Not all possible ramSize selections are valid memory sizes when using 30-pin SIMMs in the Mac SE. In theory, these combinations could be possible when using PDS memory expansion cards, but this is unlikely. The chart below indicates the valid & invalid ramSize configurations and the corresponding installed SIMM combinations.
+The Mac primary framebuffer starts at 0x5900 below the top of RAM. Since it's not in a static location for every system, the system's memory configuration is needed. This is set by three ramSize jumpers, which mask CPU address bits 21, 20, 19. Not all possible ramSize selections are valid memory sizes when using 30-pin SIMMs in the Mac SE. In theory, these combinations could be possible when using PDS memory expansion cards, but this is unlikely. The chart below indicates the valid & invalid ramSize configurations and the corresponding installed SIMM combinations.
 
 |ramSize|Main Framebuffer|Alt Framebuffer|RAM Top Address + 1|RAM Size|Installed SIMMs               |
 |:-----:|:--------------:|:-------------:|:-----------------:|:------:|------------------------------|
@@ -40,7 +40,6 @@ The Mac SE primary framebuffer starts at 0x5900 below the top of RAM. Since it's
 | 000   | 0x07a700       | 0x072700      | 0x080000          | 0.5MB  | `[256kB 256kB][ ---   --- ]` |
 
 ## CPLD Pin Assignments
-Logic uses nearly all available resources in the CPLD (104 of 128 macrocells).
 
 |signal|Direction|Pin|
 |---|---|---|
@@ -128,11 +127,10 @@ Logic uses nearly all available resources in the CPLD (104 of 128 macrocells).
 |TMS|Input|PIN_15
 
 ## Known Issues
-~~First run schematic and gerbers used three pairs of resistor dividers for R, G, B output channels. A better approach would be to use a single divider and tie all three output channels together. Also 470 ohm is a bit too high, so the image is quite dark.~~ Removed extraneous resistor dividers. Changed 470ohm resistor to 460.
-
-~~The resistor footprints are too small for 1/4W parts. Might work with 1/8W parts.~~ Added footprints for 0805 resistors. 
-
-Timing for the SE window is a bit off. It appears to be starting the window a couple pixels early on the left, and it might be cutting off the last pixel or two on the right.
-
-## Wish List
-~~I would like to bump up the pixel clock to 65MHz and run the output video at 1024x768@60. This would allow the SE frame to be pixel doubled to 1024x684, which would only leave black bars on the top and bottom, instead of on all four sides. This could also be a useful starting point for a future project to output video for an early iPad display for units missing a CRT. ~~
+- ~~First run schematic and gerbers used three pairs of resistor dividers for R, G, B output channels. A better approach would be to use a single divider and tie all three output channels together. Also 470 ohm is a bit too high, so the image is quite dark.~~ Removed extraneous resistor dividers. Changed 470ohm resistor to 460.
+- ~~The resistor footprints are too small for 1/4W parts. Might work with 1/8W parts.~~ Added footprints for 0805 resistors. 
+- ~~Timing for the SE window is a bit off. It appears to be starting the window a couple pixels early on the left, and it might be cutting off the last pixel or two on the right.~~
+- The ninth vertical line is missing from the output image, and there is a black line two pixels from the right side of the screen.
+- There is still a timing issue with VRAM writes. Some writes seem to get missed.
+- Additional decoupling is needed when using the board in 512k/Plus Macs. Without decoupling on every VCC pin of the CPLD and decoupling for the 68000 CPU, overall system stability is severely impacted. 
+- Support for alternate frame buffer is currently disabled. 
