@@ -5,6 +5,8 @@ Circuit is built around a Latice iCE40HX4K FPGA with a single 16-bit SDRAM, theo
 
 The memory capacity and output capabilities of this project greatly exceed those necessary for duplicating the classic Macintosh video output in the hopes that it may be a starting point for projects which go beyond merely duplicating the classic Macintosh video output.
 
+![MacSE Rev3 PCB Render](https://github.com/techav-homebrew/SE-VGA/blob/Rev3/Hardware/SE-VGA_Render-Front.png)
+
 ## Bill of Materials
 
 | Qty | Manufacturer    | Part No.           | Name               | Description                                   |
